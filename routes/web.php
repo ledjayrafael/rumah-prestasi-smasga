@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ForcePasswordController;
 use App\Http\Controllers\Guru\DashboardController as GuruDashboardController;
+use App\Http\Controllers\Guru\NotificationController as GuruNotificationController;
 use App\Http\Controllers\Guru\VerificationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Siswa\AchievementController;
@@ -38,7 +39,7 @@ Route::middleware(['auth', 'password.current', 'role:siswa'])
 
         Route::get('/prestasi', [AchievementController::class, 'index'])->name('achievements.index');
         Route::get('/prestasi/tambah', [AchievementController::class, 'create'])->name('achievements.create');
-        Route::post('/prestasi', [AchievementController::class, 'store'])->name('achievements.store');
+        Route::post('/prestasi', [AchievementController::class, 'store'])->middleware('throttle:6,1')->name('achievements.store');
         Route::get('/prestasi/{achievement}', [AchievementController::class, 'show'])->name('achievements.show');
 
         Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -53,6 +54,8 @@ Route::middleware(['auth', 'password.current', 'role:guru'])
     ->name('guru.')
     ->group(function () {
         Route::get('/dashboard', GuruDashboardController::class)->name('dashboard');
+
+        Route::get('/notifikasi/{notification}/baca', [GuruNotificationController::class, 'read'])->name('notifications.read');
 
         Route::get('/verifikasi', [VerificationController::class, 'index'])->name('verification.index');
         Route::get('/verifikasi/{achievement}', [VerificationController::class, 'show'])->name('verification.show');

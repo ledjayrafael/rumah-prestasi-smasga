@@ -34,5 +34,23 @@
                 Buka Antrean Verifikasi
             </a>
         </div>
+
+        @if ($notifications->isNotEmpty())
+            <div class="mt-6 bg-white border border-slate-200 rounded-2xl p-4.5">
+                <div class="text-xs font-semibold text-slate-500 mb-3">Prestasi Baru Diajukan</div>
+                <div class="divide-y divide-slate-100">
+                    @foreach ($notifications as $notification)
+                        <a href="{{ route('guru.notifications.read', $notification->id) }}"
+                           class="flex items-center justify-between py-3 first:pt-0 last:pb-0 hover:bg-slate-50 -mx-2 px-2 rounded-lg">
+                            <div class="text-sm text-navy-900">
+                                <span class="font-bold">{{ $notification->data['student_name'] }}</span>
+                                mengajukan prestasi <span class="font-semibold">{{ $notification->data['title'] }}</span>
+                            </div>
+                            <div class="text-xs text-slate-400 shrink-0 ml-4">{{ $notification->created_at->diffForHumans() }}</div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
     </div>
 @endsection

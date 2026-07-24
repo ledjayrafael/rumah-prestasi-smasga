@@ -32,6 +32,8 @@ class DashboardController extends Controller
             'active_students' => StudentProfile::whereIn('school_class_id', $classIds)->count(),
         ];
 
-        return view('guru.dashboard', compact('teacher', 'stats'));
+        $notifications = $teacher->unreadNotifications()->latest()->take(5)->get();
+
+        return view('guru.dashboard', compact('teacher', 'stats', 'notifications'));
     }
 }

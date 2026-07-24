@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Siswa;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAchievementRequest;
 use App\Models\Achievement;
+use App\Notifications\NewAchievementSubmitted;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\View\View;
 
 class AchievementController extends Controller
@@ -41,17 +44,27 @@ class AchievementController extends Controller
 
     public function store(StoreAchievementRequest $request): RedirectResponse
     {
-        $achievement = Auth::user()->achievements()->create($request->safe()->except('files'));
+        $achievement = DB::transaction(function () use ($request) {
+            $achievement = Auth::user()->achievements()->create($request->safe()->except('files'));
 
-        foreach ($request->file('files', []) as $file) {
-            $path = $file->store('bukti-prestasi', 'public');
+            foreach ($request->file('files', []) as $file) {
+                $path = $file->store('bukti-prestasi', 'public');
 
-            $achievement->files()->create([
-                'path' => $path,
-                'original_name' => $file->getClientOriginalName(),
-                'mime_type' => $file->getClientMimeType(),
-                'size' => $file->getSize(),
-            ]);
+                $achievement->files()->create([
+                    'path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getClientMimeType(),
+                    'size' => $file->getSize(),
+                ]);
+            }
+
+            return $achievement;
+        });
+
+        $classTeachers = Auth::user()->studentProfile?->schoolClass?->teachers;
+
+        if ($classTeachers && $classTeachers->isNotEmpty()) {
+            Notification::send($classTeachers, new NewAchievementSubmitted($achievement));
         }
 
         return redirect()->route('siswa.achievements.index')
