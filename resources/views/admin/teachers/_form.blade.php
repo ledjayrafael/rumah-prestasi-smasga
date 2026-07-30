@@ -28,11 +28,14 @@
     </div>
     <div>
         <label class="block text-xs font-bold text-slate-600 mb-1.5">Peran</label>
-        <select name="position" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy-700">
-            @foreach (\App\Enums\TeacherPosition::cases() as $option)
-                <option value="{{ $option->value }}" @selected(old('position', $teacher->teacherProfile->position->value ?? '') === $option->value)>{{ $option->label() }}</option>
-            @endforeach
-        </select>
+        <div class="relative">
+            <select name="position" required class="w-full appearance-none rounded-xl border border-slate-300 pl-3.5 pr-8 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy-700">
+                @foreach (\App\Enums\TeacherPosition::cases() as $option)
+                    <option value="{{ $option->value }}" @selected(old('position', $teacher->teacherProfile->position->value ?? '') === $option->value)>{{ $option->label() }}</option>
+                @endforeach
+            </select>
+            <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
     </div>
 </div>
 

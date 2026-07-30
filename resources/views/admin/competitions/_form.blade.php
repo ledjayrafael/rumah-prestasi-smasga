@@ -10,19 +10,25 @@
 <div class="grid grid-cols-2 gap-4 mt-4">
     <div>
         <label class="block text-xs font-bold text-slate-600 mb-1.5">Kategori</label>
-        <select name="category" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy-700">
-            @foreach (\App\Enums\AchievementCategory::cases() as $option)
-                <option value="{{ $option->value }}" @selected(old('category', $competition->category->value ?? '') === $option->value)>{{ $option->label() }}</option>
-            @endforeach
-        </select>
+        <div class="relative">
+            <select name="category" required class="w-full appearance-none rounded-xl border border-slate-300 pl-3.5 pr-8 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy-700">
+                @foreach (\App\Enums\AchievementCategory::cases() as $option)
+                    <option value="{{ $option->value }}" @selected(old('category', $competition->category->value ?? '') === $option->value)>{{ $option->label() }}</option>
+                @endforeach
+            </select>
+            <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
     </div>
     <div>
         <label class="block text-xs font-bold text-slate-600 mb-1.5">Tingkat</label>
-        <select name="level" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy-700">
-            @foreach (\App\Enums\AchievementLevel::cases() as $option)
-                <option value="{{ $option->value }}" @selected(old('level', $competition->level->value ?? '') === $option->value)>{{ $option->label() }}</option>
-            @endforeach
-        </select>
+        <div class="relative">
+            <select name="level" required class="w-full appearance-none rounded-xl border border-slate-300 pl-3.5 pr-8 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy-700">
+                @foreach (\App\Enums\AchievementLevel::cases() as $option)
+                    <option value="{{ $option->value }}" @selected(old('level', $competition->level->value ?? '') === $option->value)>{{ $option->label() }}</option>
+                @endforeach
+            </select>
+            <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
     </div>
 </div>
 
