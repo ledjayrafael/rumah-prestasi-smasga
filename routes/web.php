@@ -45,6 +45,7 @@ Route::middleware(['auth', 'password.current', 'role:siswa'])
         Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
         Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+        Route::post('/profil/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
 
         Route::get('/info-lomba', [SiswaCompetitionController::class, 'index'])->name('competitions.index');
     });
