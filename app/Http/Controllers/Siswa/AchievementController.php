@@ -33,7 +33,9 @@ class AchievementController extends Controller
         $query = Auth::user()->achievements()->latest('event_date');
 
         if ($status = $request->query('status')) {
-            $query->where('status', $status);
+            if (in_array($status, ['pending', 'approved', 'revision'], true)) {
+                $query->where('status', $status);
+            }
         }
 
         $achievements = $query->paginate(10)->withQueryString();
@@ -97,7 +99,7 @@ class AchievementController extends Controller
 
             if ($uploaded !== []) {
                 foreach ($achievement->files as $existing) {
-                    Storage::disk('public')->delete($existing->path);
+                    Storage::disk('local')->delete($existing->path);
                     $existing->delete();
                 }
 
@@ -122,7 +124,7 @@ class AchievementController extends Controller
                 continue;
             }
 
-            $path = $file->store('bukti-prestasi', 'public');
+            $path = $file->store('bukti-prestasi', 'local');
 
             $achievement->files()->create([
                 'path' => $path,

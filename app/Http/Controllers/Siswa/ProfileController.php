@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -33,18 +34,21 @@ class ProfileController extends Controller
     public function updateAvatar(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'avatar' => ['required', 'file', 'mimes:webp', 'max:4096'],
+            'avatar' => [
+                'required',
+                File::types(['webp'])->max(4096)->dimensions(maxWidth: 4096, maxHeight: 4096),
+            ],
         ]);
 
         $user = Auth::user();
         $oldPath = $user->avatar_path;
 
-        $path = $validated['avatar']->store('avatars', 'public');
+        $path = $validated['avatar']->store('avatars', 'local');
 
         $user->update(['avatar_path' => $path]);
 
         if ($oldPath) {
-            Storage::disk('public')->delete($oldPath);
+            Storage::disk('local')->delete($oldPath);
         }
 
         return response()->json([

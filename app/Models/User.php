@@ -6,12 +6,11 @@ namespace App\Models;
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -101,7 +100,7 @@ class User extends Authenticatable
     public function avatarUrl(): ?string
     {
         return $this->avatar_path
-            ? Storage::disk('public')->url($this->avatar_path)
+            ? route('siswa.avatar.show', $this)
             : null;
     }
 }

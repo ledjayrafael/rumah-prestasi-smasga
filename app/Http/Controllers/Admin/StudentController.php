@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdateStudentRequest;
 use App\Models\SchoolClass;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -55,10 +56,22 @@ class StudentController extends Controller
             return $student;
         });
 
-        return redirect()->route('admin.students.index')->with(
-            'credentials',
-            "Akun siswa {$student->name} berhasil dibuat. Login (NIS): {$validated['nis']} — Password sementara: {$temporaryPassword}"
-        );
+        Cache::put("temp_credential:{$student->id}", [
+            'name' => $student->name,
+            'login' => $validated['nis'],
+            'password' => $temporaryPassword,
+        ], now()->addMinutes(3));
+
+        return redirect()->route('admin.students.credentials', $student);
+    }
+
+    public function credentials(User $student): View
+    {
+        abort_unless($student->role === UserRole::Siswa, 404);
+
+        $credential = Cache::pull("temp_credential:{$student->id}");
+
+        return view('admin.students.credentials', compact('credential'));
     }
 
     public function edit(User $student): View

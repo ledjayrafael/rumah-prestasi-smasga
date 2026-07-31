@@ -8,13 +8,14 @@ use App\Enums\ParticipationType;
 use App\Models\Achievement;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Validator;
 
 class UpdateAchievementRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->isSiswa() ?? false;
     }
 
     public function rules(): array
@@ -29,7 +30,10 @@ class UpdateAchievementRequest extends FormRequest
             'event_date' => ['required', 'date', 'before_or_equal:today'],
             'description' => ['nullable', 'string', 'max:2000'],
             'files' => ['nullable', 'array', 'max:5'],
-            'files.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:10240'],
+            'files.*' => [
+                'nullable',
+                File::types(['jpg', 'jpeg', 'png', 'pdf'])->max(10240),
+            ],
         ];
     }
 

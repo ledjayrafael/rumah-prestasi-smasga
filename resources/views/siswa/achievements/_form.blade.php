@@ -1,9 +1,27 @@
 @php
     /** @var \App\Models\Achievement|null $achievement */
     $achievement = $achievement ?? null;
+    $progressTitle = $achievement ? 'Menyimpan perbaikan…' : 'Mengirim prestasi…';
 @endphp
 
-<form method="POST" action="{{ $action }}" enctype="multipart/form-data" class="px-4 flex flex-col gap-3.5 mt-1">
+<div id="achievement-progress-toast" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white border border-slate-200 shadow-xl px-4 py-3.5" role="status" aria-live="polite">
+    <div id="achievement-progress-title" class="text-sm font-extrabold text-navy-900 mb-2">{{ $progressTitle }}</div>
+    <div class="flex items-center justify-between text-[11px] font-semibold text-slate-500 mb-1">
+        <span id="achievement-progress-label">Memproses…</span>
+        <span id="achievement-progress-text" class="font-mono tabular-nums">0%</span>
+    </div>
+    <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+        <div id="achievement-progress-bar" class="h-full bg-gradient-to-r from-gold-600 to-gold-400 transition-[width] duration-150 ease-out" style="width:0%"></div>
+    </div>
+</div>
+
+<div id="achievement-error-toast" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-md rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium px-4 py-3 shadow-lg" role="alert"></div>
+
+<div id="achievement-form-errors" class="hidden mx-4 mb-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium px-4 py-3">
+    <ul class="list-disc list-inside space-y-1"></ul>
+</div>
+
+<form id="achievement-submit-form" method="POST" action="{{ $action }}" enctype="multipart/form-data" class="px-4 flex flex-col gap-3.5 mt-1">
     @csrf
     @isset($method)
         @method($method)
@@ -139,8 +157,8 @@
         @enderror
     </div>
 
-    <button type="submit"
-            class="mt-2 h-13 rounded-2xl bg-navy-800 text-white text-sm font-bold shadow-lg shadow-navy-800/30 py-3.5">
+    <button type="submit" id="achievement-submit-btn"
+            class="mt-2 h-13 rounded-2xl bg-navy-800 text-white text-sm font-bold shadow-lg shadow-navy-800/30 py-3.5 disabled:opacity-60 disabled:pointer-events-none">
         {{ $submitLabel }}
     </button>
 </form>
@@ -174,4 +192,227 @@
             removeBtn.classList.add('hidden');
         });
     });
+
+    (function () {
+        const form = document.getElementById('achievement-submit-form');
+        const submitBtn = document.getElementById('achievement-submit-btn');
+        const progressToast = document.getElementById('achievement-progress-toast');
+        const progressBar = document.getElementById('achievement-progress-bar');
+        const progressText = document.getElementById('achievement-progress-text');
+        const progressLabel = document.getElementById('achievement-progress-label');
+        const errorToast = document.getElementById('achievement-error-toast');
+        const formErrors = document.getElementById('achievement-form-errors');
+        const formErrorsList = formErrors.querySelector('ul');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+        const GIMMICK_MAX = 30;
+        const REAL_RANGE = 70;
+        const GIMMICK_DURATION_MS = 1200;
+
+        let gimmickRaf = null;
+        let fallbackInterval = null;
+        let displayedProgress = 0;
+        let gimmickProgress = 0;
+        let uploadProgress = 0;
+
+        function hideProgressToast() {
+            progressToast.classList.add('hidden');
+            if (gimmickRaf) {
+                cancelAnimationFrame(gimmickRaf);
+                gimmickRaf = null;
+            }
+            if (fallbackInterval) {
+                clearInterval(fallbackInterval);
+                fallbackInterval = null;
+            }
+        }
+
+        function showErrorToast(message) {
+            errorToast.textContent = message;
+            errorToast.classList.remove('hidden');
+            setTimeout(function () {
+                errorToast.classList.add('hidden');
+            }, 5000);
+        }
+
+        function clearFormErrors() {
+            formErrorsList.innerHTML = '';
+            formErrors.classList.add('hidden');
+        }
+
+        function showFormErrors(errors) {
+            clearFormErrors();
+            const messages = [];
+            if (errors && typeof errors === 'object') {
+                Object.values(errors).forEach(function (fieldMessages) {
+                    (fieldMessages || []).forEach(function (msg) {
+                        messages.push(msg);
+                    });
+                });
+            }
+            if (errors && typeof errors === 'string') {
+                messages.push(errors);
+            }
+            if (messages.length === 0) {
+                messages.push('Data tidak valid. Periksa kembali formulir.');
+            }
+            messages.forEach(function (msg) {
+                const li = document.createElement('li');
+                li.textContent = msg;
+                formErrorsList.appendChild(li);
+            });
+            formErrors.classList.remove('hidden');
+            formErrors.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function renderProgress() {
+            let next;
+            if (uploadProgress > 0) {
+                next = Math.max(gimmickProgress, GIMMICK_MAX + uploadProgress);
+            } else {
+                next = gimmickProgress;
+            }
+            displayedProgress = Math.min(99, Math.max(displayedProgress, next));
+            progressBar.style.width = displayedProgress + '%';
+            progressText.textContent = Math.round(displayedProgress) + '%';
+        }
+
+        function setCompleteProgress() {
+            displayedProgress = 100;
+            progressBar.style.width = '100%';
+            progressText.textContent = '100%';
+            progressLabel.textContent = 'Selesai';
+        }
+
+        function startGimmickProgress() {
+            const start = performance.now();
+            function tick(now) {
+                const elapsed = now - start;
+                const t = Math.min(1, elapsed / GIMMICK_DURATION_MS);
+                const eased = 1 - Math.pow(1 - t, 3);
+                gimmickProgress = eased * GIMMICK_MAX;
+                renderProgress();
+                if (t < 1) {
+                    gimmickRaf = requestAnimationFrame(tick);
+                }
+            }
+            gimmickRaf = requestAnimationFrame(tick);
+        }
+
+        function startFallbackProgress() {
+            fallbackInterval = setInterval(function () {
+                if (uploadProgress > 0) {
+                    return;
+                }
+                uploadProgress = Math.min(REAL_RANGE - 5, uploadProgress + 1.5);
+                renderProgress();
+            }, 200);
+        }
+
+        function finishSubmitError(message, validationErrors) {
+            hideProgressToast();
+            submitBtn.disabled = false;
+            if (validationErrors) {
+                showFormErrors(validationErrors);
+            } else if (message) {
+                showErrorToast(message);
+            }
+        }
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            clearFormErrors();
+            errorToast.classList.add('hidden');
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            displayedProgress = 0;
+            gimmickProgress = 0;
+            uploadProgress = 0;
+            progressBar.style.width = '0%';
+            progressText.textContent = '0%';
+            progressLabel.textContent = 'Memproses…';
+            progressToast.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            startGimmickProgress();
+            startFallbackProgress();
+
+            const formData = new FormData(form);
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', form.action);
+            xhr.timeout = 300000;
+
+            if (csrfToken) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            }
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.setRequestHeader('Accept', 'application/json');
+
+            xhr.upload.addEventListener('progress', function (e) {
+                if (!e.lengthComputable) {
+                    return;
+                }
+                uploadProgress = (e.loaded / e.total) * REAL_RANGE;
+                renderProgress();
+            });
+
+            xhr.addEventListener('load', function () {
+                if (fallbackInterval) {
+                    clearInterval(fallbackInterval);
+                    fallbackInterval = null;
+                }
+
+                if (xhr.status === 422) {
+                    let payload = {};
+                    try {
+                        payload = JSON.parse(xhr.responseText);
+                    } catch (e) {}
+                    finishSubmitError(null, payload.errors || payload.message);
+                    return;
+                }
+
+                if (xhr.status === 419) {
+                    finishSubmitError('Sesi habis. Muat ulang halaman lalu coba lagi.');
+                    return;
+                }
+
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    setCompleteProgress();
+                    window.location.href = xhr.responseURL || form.action;
+                    return;
+                }
+
+                let message = 'Gagal mengirim prestasi. Coba lagi.';
+                try {
+                    const payload = JSON.parse(xhr.responseText);
+                    if (payload.message) {
+                        message = payload.message;
+                    }
+                } catch (e) {}
+                finishSubmitError(message);
+            });
+
+            xhr.addEventListener('error', function () {
+                finishSubmitError('Koneksi gagal. Periksa jaringan Anda dan coba lagi.');
+            });
+
+            xhr.addEventListener('timeout', function () {
+                finishSubmitError('Waktu habis. Periksa koneksi atau ukuran berkas, lalu coba lagi.');
+            });
+
+            xhr.addEventListener('abort', function () {
+                finishSubmitError('Pengiriman dibatalkan.');
+            });
+
+            try {
+                xhr.send(formData);
+            } catch (e) {
+                finishSubmitError('Terjadi kesalahan saat mengirim data. Coba lagi.');
+            }
+        });
+    })();
 </script>

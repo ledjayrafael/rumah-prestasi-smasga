@@ -7,12 +7,13 @@ use App\Enums\AchievementLevel;
 use App\Enums\ParticipationType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\File;
 
 class StoreAchievementRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->isSiswa() ?? false;
     }
 
     public function rules(): array
@@ -27,7 +28,10 @@ class StoreAchievementRequest extends FormRequest
             'event_date' => ['required', 'date', 'before_or_equal:today'],
             'description' => ['nullable', 'string', 'max:2000'],
             'files' => ['required', 'array', 'min:1', 'max:5'],
-            'files.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:10240'],
+            'files.*' => [
+                'nullable',
+                File::types(['jpg', 'jpeg', 'png', 'pdf'])->max(10240),
+            ],
         ];
     }
 }

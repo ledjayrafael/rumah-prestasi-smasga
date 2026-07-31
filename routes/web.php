@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AchievementFileController;
 use App\Http\Controllers\Admin\ClassController;
 use App\Http\Controllers\Admin\CompetitionController as AdminCompetitionController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Guru\NotificationController as GuruNotificationControll
 use App\Http\Controllers\Guru\VerificationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Siswa\AchievementController;
+use App\Http\Controllers\Siswa\AvatarController;
 use App\Http\Controllers\Siswa\CompetitionController as SiswaCompetitionController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
 use App\Http\Controllers\Siswa\ProfileController;
@@ -21,7 +23,7 @@ Route::get('/', HomeController::class)->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:10,1');
 });
 
 Route::middleware('auth')->group(function () {
@@ -29,6 +31,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/ganti-password-wajib', [ForcePasswordController::class, 'edit'])->name('password.force.edit');
     Route::put('/ganti-password-wajib', [ForcePasswordController::class, 'update'])->name('password.force.update');
+});
+
+Route::middleware(['auth', 'password.current'])->group(function () {
+    Route::get('/prestasi/berkas/{file}', [AchievementFileController::class, 'show'])
+        ->name('achievement-files.show');
+    Route::get('/avatar/{user}', [AvatarController::class, 'show'])
+        ->name('siswa.avatar.show');
 });
 
 Route::middleware(['auth', 'password.current', 'role:siswa'])
@@ -71,6 +80,9 @@ Route::middleware(['auth', 'password.current', 'role:admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
+
+        Route::get('/siswa/{student}/kredensial', [StudentController::class, 'credentials'])->name('students.credentials');
+        Route::get('/guru/{teacher}/kredensial', [TeacherController::class, 'credentials'])->name('teachers.credentials');
 
         Route::resource('kelas', ClassController::class)
             ->parameters(['kelas' => 'class'])

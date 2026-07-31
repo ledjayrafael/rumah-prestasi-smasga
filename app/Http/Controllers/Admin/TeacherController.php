@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdateTeacherRequest;
 use App\Models\SchoolClass;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -59,10 +60,22 @@ class TeacherController extends Controller
             return $teacher;
         });
 
-        return redirect()->route('admin.teachers.index')->with(
-            'credentials',
-            "Akun guru {$teacher->name} berhasil dibuat. Login: {$teacher->email} — Password sementara: {$temporaryPassword}"
-        );
+        Cache::put("temp_credential:{$teacher->id}", [
+            'name' => $teacher->name,
+            'login' => $teacher->email,
+            'password' => $temporaryPassword,
+        ], now()->addMinutes(3));
+
+        return redirect()->route('admin.teachers.credentials', $teacher);
+    }
+
+    public function credentials(User $teacher): View
+    {
+        abort_unless($teacher->role === UserRole::Guru, 404);
+
+        $credential = Cache::pull("temp_credential:{$teacher->id}");
+
+        return view('admin.teachers.credentials', compact('credential'));
     }
 
     public function edit(User $teacher): View

@@ -6,6 +6,7 @@ use App\Enums\AchievementStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RequestRevisionRequest;
 use App\Models\Achievement;
+use App\Support\AuthorizesAchievementAccess;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,8 @@ use Illuminate\View\View;
 
 class VerificationController extends Controller
 {
+    use AuthorizesAchievementAccess;
+
     public function index(Request $request): View
     {
         $teacher = Auth::user();
@@ -41,7 +44,7 @@ class VerificationController extends Controller
 
     public function show(Achievement $achievement): View
     {
-        $this->authorizeAccess($achievement);
+        $this->authorizeAchievementAccess($achievement);
 
         $achievement->load(['student.studentProfile.schoolClass', 'files']);
 
@@ -50,7 +53,7 @@ class VerificationController extends Controller
 
     public function approve(Achievement $achievement): RedirectResponse
     {
-        $this->authorizeAccess($achievement);
+        $this->authorizeAchievementAccess($achievement);
         $this->ensurePending($achievement);
 
         $achievement->update([
@@ -66,7 +69,7 @@ class VerificationController extends Controller
 
     public function requestRevision(RequestRevisionRequest $request, Achievement $achievement): RedirectResponse
     {
-        $this->authorizeAccess($achievement);
+        $this->authorizeAchievementAccess($achievement);
         $this->ensurePending($achievement);
 
         $achievement->update([
@@ -78,15 +81,6 @@ class VerificationController extends Controller
 
         return redirect()->route('guru.verification.index')
             ->with('status', 'Permintaan revisi dikirim ke siswa.');
-    }
-
-    private function authorizeAccess(Achievement $achievement): void
-    {
-        $teacher = Auth::user();
-        $classIds = $teacher->taughtClasses()->pluck('school_classes.id');
-        $studentClassId = $achievement->student->studentProfile?->school_class_id;
-
-        abort_unless($studentClassId && $classIds->contains($studentClassId), 403);
     }
 
     private function ensurePending(Achievement $achievement): void

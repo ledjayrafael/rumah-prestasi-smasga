@@ -20,6 +20,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if (! app()->environment('local', 'testing')) {
+            return;
+        }
+
         $admin = User::create([
             'name' => 'Bambang Wijaya',
             'username' => 'admin@sman1tenggarang.sch.id',

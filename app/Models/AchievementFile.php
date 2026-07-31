@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
 
 class AchievementFile extends Model
 {
@@ -28,6 +27,6 @@ class AchievementFile extends Model
 
     public function url(): string
     {
-        return Storage::disk('public')->url($this->path);
+        return route('achievement-files.show', $this);
     }
 }

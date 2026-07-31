@@ -13,6 +13,12 @@ class NotificationController extends Controller
         $record = Auth::user()->notifications()->findOrFail($notification);
         $record->markAsRead();
 
-        return redirect()->to($record->data['url'] ?? route('guru.dashboard'));
+        $achievementId = $record->data['achievement_id'] ?? null;
+
+        if ($achievementId) {
+            return redirect()->route('guru.verification.show', $achievementId);
+        }
+
+        return redirect()->route('guru.dashboard');
     }
 }
