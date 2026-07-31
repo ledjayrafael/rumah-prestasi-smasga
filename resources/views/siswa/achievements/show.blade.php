@@ -18,11 +18,17 @@
             <x-status-badge :status="$achievement->status" class="text-xs" />
         </div>
 
-        @if ($achievement->status->value === 'revision' && $achievement->reviewer_notes)
-            <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-2xl p-3.5 mb-3">
-                <div class="font-bold text-xs mb-1">Catatan revisi dari guru:</div>
-                {{ $achievement->reviewer_notes }}
-            </div>
+        @if ($achievement->status->value === 'revision')
+            @if ($achievement->reviewer_notes)
+                <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-2xl p-3.5 mb-3">
+                    <div class="font-bold text-xs mb-1">Catatan revisi dari guru:</div>
+                    {{ $achievement->reviewer_notes }}
+                </div>
+            @endif
+            <a href="{{ route('siswa.achievements.edit', $achievement) }}"
+               class="mb-3 flex items-center justify-center gap-2 h-12 rounded-2xl bg-navy-800 text-white text-sm font-bold shadow-lg shadow-navy-800/30">
+                Perbaiki &amp; Kirim Ulang
+            </a>
         @endif
 
         <div class="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col gap-3">

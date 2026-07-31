@@ -27,7 +27,8 @@ class ClassController extends Controller
 
     public function store(StoreClassRequest $request): RedirectResponse
     {
-        SchoolClass::create($request->validated());
+        $class = SchoolClass::create($request->validated());
+        $this->syncHomeroomTeacher($class);
 
         return redirect()->route('admin.classes.index')->with('status', 'Kelas berhasil ditambahkan.');
     }
@@ -42,6 +43,7 @@ class ClassController extends Controller
     public function update(StoreClassRequest $request, SchoolClass $class): RedirectResponse
     {
         $class->update($request->validated());
+        $this->syncHomeroomTeacher($class->fresh());
 
         return redirect()->route('admin.classes.index')->with('status', 'Kelas berhasil diperbarui.');
     }
@@ -51,5 +53,12 @@ class ClassController extends Controller
         $class->delete();
 
         return back()->with('status', 'Kelas berhasil dihapus.');
+    }
+
+    private function syncHomeroomTeacher(SchoolClass $class): void
+    {
+        if ($class->homeroom_teacher_id) {
+            $class->teachers()->syncWithoutDetaching([$class->homeroom_teacher_id]);
+        }
     }
 }

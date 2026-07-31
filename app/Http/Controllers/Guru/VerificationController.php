@@ -51,6 +51,7 @@ class VerificationController extends Controller
     public function approve(Achievement $achievement): RedirectResponse
     {
         $this->authorizeAccess($achievement);
+        $this->ensurePending($achievement);
 
         $achievement->update([
             'status' => AchievementStatus::Approved,
@@ -66,6 +67,7 @@ class VerificationController extends Controller
     public function requestRevision(RequestRevisionRequest $request, Achievement $achievement): RedirectResponse
     {
         $this->authorizeAccess($achievement);
+        $this->ensurePending($achievement);
 
         $achievement->update([
             'status' => AchievementStatus::Revision,
@@ -85,5 +87,10 @@ class VerificationController extends Controller
         $studentClassId = $achievement->student->studentProfile?->school_class_id;
 
         abort_unless($studentClassId && $classIds->contains($studentClassId), 403);
+    }
+
+    private function ensurePending(Achievement $achievement): void
+    {
+        abort_unless($achievement->status === AchievementStatus::Pending, 403);
     }
 }

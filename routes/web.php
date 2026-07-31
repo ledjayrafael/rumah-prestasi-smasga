@@ -40,6 +40,8 @@ Route::middleware(['auth', 'password.current', 'role:siswa'])
         Route::get('/prestasi', [AchievementController::class, 'index'])->name('achievements.index');
         Route::get('/prestasi/tambah', [AchievementController::class, 'create'])->name('achievements.create');
         Route::post('/prestasi', [AchievementController::class, 'store'])->middleware('throttle:6,1')->name('achievements.store');
+        Route::get('/prestasi/{achievement}/perbaiki', [AchievementController::class, 'edit'])->name('achievements.edit');
+        Route::put('/prestasi/{achievement}', [AchievementController::class, 'update'])->middleware('throttle:6,1')->name('achievements.update');
         Route::get('/prestasi/{achievement}', [AchievementController::class, 'show'])->name('achievements.show');
 
         Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');

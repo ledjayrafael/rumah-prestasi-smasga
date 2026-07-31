@@ -15,7 +15,7 @@
         @yield('content')
     </div>
 
-    @unless(request()->routeIs('siswa.achievements.create'))
+    @unless(request()->routeIs('siswa.achievements.create', 'siswa.achievements.edit'))
     <nav class="fixed left-1/2 -translate-x-1/2 bottom-4 w-[calc(100%-2rem)] max-w-md h-[70px] rounded-[26px]
                 bg-gradient-to-br from-navy-700 to-navy-950 border border-white/10 shadow-2xl flex items-center px-2 z-40">
         <div class="flex-1 flex items-center justify-around">

@@ -3,17 +3,11 @@
 namespace App\Notifications;
 
 use App\Models\Achievement;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class NewAchievementSubmitted extends Notification implements ShouldQueue
+class NewAchievementSubmitted extends Notification
 {
-    use Queueable;
-
-    public function __construct(private readonly Achievement $achievement)
-    {
-    }
+    public function __construct(private readonly Achievement $achievement) {}
 
     /**
      * @return array<int, string>
