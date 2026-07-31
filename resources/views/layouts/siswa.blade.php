@@ -15,6 +15,7 @@
         @yield('content')
     </div>
 
+    @unless(request()->routeIs('siswa.achievements.create'))
     <nav class="fixed left-1/2 -translate-x-1/2 bottom-4 w-[calc(100%-2rem)] max-w-md h-[70px] rounded-[26px]
                 bg-gradient-to-br from-navy-700 to-navy-950 border border-white/10 shadow-2xl flex items-center px-2 z-40">
         <div class="flex-1 flex items-center justify-around">
@@ -50,5 +51,6 @@
             <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#231E52" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         </a>
     </nav>
+    @endunless
 </body>
 </html>
