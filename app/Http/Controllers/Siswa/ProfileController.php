@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
@@ -36,7 +37,10 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'avatar' => [
                 'required',
-                File::types(['webp'])->max(4096)->dimensions(maxWidth: 4096, maxHeight: 4096),
+                File::image()
+                    ->extensions(['webp'])
+                    ->max(4096)
+                    ->dimensions(Rule::dimensions()->maxWidth(4096)->maxHeight(4096)),
             ],
         ]);
 

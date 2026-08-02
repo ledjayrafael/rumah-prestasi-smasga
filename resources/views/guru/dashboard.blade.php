@@ -35,6 +35,40 @@
             </a>
         </div>
 
+        <div class="mt-6">
+            <div class="text-sm font-extrabold text-navy-900 mb-3">Statistik Kelas</div>
+
+            @if ($chartData['coverage']['total_students'] === 0)
+                <div class="bg-white border border-slate-200 rounded-2xl p-4.5 text-sm text-slate-500">
+                    Belum ada siswa binaan.
+                </div>
+            @else
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4.5">
+                        <div class="text-xs font-semibold text-slate-500 mb-3">Cakupan Siswa Berprestasi</div>
+                        <div class="h-56">
+                            <canvas id="coverage-chart"></canvas>
+                        </div>
+                        <div class="text-xs text-slate-500 mt-3 text-center">
+                            <span class="font-extrabold text-navy-900">{{ $chartData['coverage']['with_approved'] }}</span>
+                            dari
+                            <span class="font-extrabold text-navy-900">{{ $chartData['coverage']['total_students'] }}</span>
+                            siswa punya prestasi disetujui
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4.5">
+                        <div class="text-xs font-semibold text-slate-500 mb-3">Prestasi Disetujui per Kategori</div>
+                        <div class="h-56">
+                            <canvas id="category-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <script type="application/json" id="guru-dashboard-chart-data">@json($chartData)</script>
+            @endif
+        </div>
+
         @if ($notifications->isNotEmpty())
             <div class="mt-6 bg-white border border-slate-200 rounded-2xl p-4.5">
                 <div class="text-xs font-semibold text-slate-500 mb-3">Prestasi Baru Diajukan</div>
@@ -53,4 +87,8 @@
             </div>
         @endif
     </div>
+
+    @push('scripts')
+        @vite('resources/js/guru-dashboard-charts.js')
+    @endpush
 @endsection

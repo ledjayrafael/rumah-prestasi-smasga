@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\EnsurePasswordIsCurrent;
+use App\Http\Middleware\EnsureUserHasRole;
+use App\Http\Middleware\EnsureUserIsWaliKelas;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,8 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role' => \App\Http\Middleware\EnsureUserHasRole::class,
-            'password.current' => \App\Http\Middleware\EnsurePasswordIsCurrent::class,
+            'role' => EnsureUserHasRole::class,
+            'password.current' => EnsurePasswordIsCurrent::class,
+            'wali_kelas' => EnsureUserIsWaliKelas::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

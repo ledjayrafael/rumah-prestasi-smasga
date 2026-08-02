@@ -4,12 +4,13 @@ use App\Http\Controllers\AchievementFileController;
 use App\Http\Controllers\Admin\ClassController;
 use App\Http\Controllers\Admin\CompetitionController as AdminCompetitionController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ForcePasswordController;
 use App\Http\Controllers\Guru\DashboardController as GuruDashboardController;
 use App\Http\Controllers\Guru\NotificationController as GuruNotificationController;
+use App\Http\Controllers\Guru\StudentController as GuruStudentController;
+use App\Http\Controllers\Guru\StudentImportController;
 use App\Http\Controllers\Guru\VerificationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Siswa\AchievementController;
@@ -73,6 +74,20 @@ Route::middleware(['auth', 'password.current', 'role:guru'])
         Route::get('/verifikasi/{achievement}', [VerificationController::class, 'show'])->name('verification.show');
         Route::post('/verifikasi/{achievement}/setujui', [VerificationController::class, 'approve'])->name('verification.approve');
         Route::post('/verifikasi/{achievement}/revisi', [VerificationController::class, 'requestRevision'])->name('verification.revise');
+
+        Route::middleware('wali_kelas')->group(function () {
+            Route::get('/siswa/import/template', [StudentImportController::class, 'template'])->name('students.import.template');
+            Route::get('/siswa/import/kredensial', [StudentImportController::class, 'credentials'])->name('students.import.credentials');
+            Route::get('/siswa/import', [StudentImportController::class, 'create'])->name('students.import.create');
+            Route::post('/siswa/import', [StudentImportController::class, 'store'])
+                ->middleware('throttle:3,1')
+                ->name('students.import.store');
+            Route::get('/siswa/{student}/kredensial', [GuruStudentController::class, 'credentials'])->name('students.credentials');
+            Route::resource('siswa', GuruStudentController::class)
+                ->parameters(['siswa' => 'student'])
+                ->names('students')
+                ->except(['show']);
+        });
     });
 
 Route::middleware(['auth', 'password.current', 'role:admin'])
@@ -81,7 +96,6 @@ Route::middleware(['auth', 'password.current', 'role:admin'])
     ->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
 
-        Route::get('/siswa/{student}/kredensial', [StudentController::class, 'credentials'])->name('students.credentials');
         Route::get('/guru/{teacher}/kredensial', [TeacherController::class, 'credentials'])->name('teachers.credentials');
 
         Route::resource('kelas', ClassController::class)
@@ -92,11 +106,6 @@ Route::middleware(['auth', 'password.current', 'role:admin'])
         Route::resource('guru', TeacherController::class)
             ->parameters(['guru' => 'teacher'])
             ->names('teachers')
-            ->except(['show']);
-
-        Route::resource('siswa', StudentController::class)
-            ->parameters(['siswa' => 'student'])
-            ->names('students')
             ->except(['show']);
 
         Route::resource('info-lomba', AdminCompetitionController::class)

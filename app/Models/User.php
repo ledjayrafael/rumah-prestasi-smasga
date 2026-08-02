@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\TeacherPosition;
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
 class User extends Authenticatable
 {
@@ -76,6 +78,12 @@ class User extends Authenticatable
         return $this->belongsToMany(SchoolClass::class, 'class_teacher');
     }
 
+    /** Kelas where user is the official homeroom teacher (wali kelas). */
+    public function homeroomClasses(): HasMany
+    {
+        return $this->hasMany(SchoolClass::class, 'homeroom_teacher_id');
+    }
+
     /** Prestasi milik siswa ini. */
     public function achievements(): HasMany
     {
@@ -95,6 +103,32 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === UserRole::Admin;
+    }
+
+    public function isWaliKelas(): bool
+    {
+        if ($this->role !== UserRole::Guru) {
+            return false;
+        }
+
+        return $this->teacherProfile?->position === TeacherPosition::WaliKelas;
+    }
+
+    /** @return Collection<int, int> */
+    public function manageableClassIds(): Collection
+    {
+        return $this->homeroomClasses()->pluck('id');
+    }
+
+    public function canManageStudent(User $student): bool
+    {
+        if ($student->role !== UserRole::Siswa) {
+            return false;
+        }
+
+        $classId = $student->studentProfile?->school_class_id;
+
+        return $classId !== null && $this->manageableClassIds()->contains($classId);
     }
 
     public function avatarUrl(): ?string
