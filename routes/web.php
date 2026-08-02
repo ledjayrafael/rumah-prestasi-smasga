@@ -4,6 +4,7 @@ use App\Http\Controllers\AchievementFileController;
 use App\Http\Controllers\Admin\ClassController;
 use App\Http\Controllers\Admin\CompetitionController as AdminCompetitionController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ForcePasswordController;
@@ -107,6 +108,9 @@ Route::middleware(['auth', 'password.current', 'role:admin'])
             ->parameters(['guru' => 'teacher'])
             ->names('teachers')
             ->except(['show']);
+
+        Route::get('/siswa', [AdminStudentController::class, 'index'])->name('students.index');
+        Route::post('/siswa/pindah-kelas', [AdminStudentController::class, 'bulkMove'])->name('students.bulk-move');
 
         Route::resource('info-lomba', AdminCompetitionController::class)
             ->parameters(['info-lomba' => 'competition'])

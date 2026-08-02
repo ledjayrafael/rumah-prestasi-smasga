@@ -97,6 +97,8 @@ return [
         'subject' => 'mata pelajaran',
         'position' => 'peran',
         'class_ids' => 'kelas binaan',
+        'student_ids' => 'siswa',
+        'student_ids.*' => 'siswa',
         'password' => 'kata sandi',
         'current_password' => 'kata sandi saat ini',
         'registration_deadline' => 'tutup pendaftaran',

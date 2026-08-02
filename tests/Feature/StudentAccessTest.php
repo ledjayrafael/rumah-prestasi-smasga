@@ -20,13 +20,13 @@ class StudentAccessTest extends TestCase
         $this->seed();
     }
 
-    public function test_admin_cannot_access_student_management_routes(): void
+    public function test_admin_can_access_student_management_index(): void
     {
         $admin = User::where('role', UserRole::Admin)->firstOrFail();
 
         $this->actingAs($admin)
             ->get('/admin/siswa')
-            ->assertNotFound();
+            ->assertOk();
     }
 
     public function test_guru_mapel_cannot_access_student_routes(): void
