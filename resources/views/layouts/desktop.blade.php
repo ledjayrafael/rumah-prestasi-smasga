@@ -8,7 +8,7 @@
 </head>
 <body class="bg-[#F4F5FA] text-navy-900">
     <div class="flex min-h-screen">
-        <aside class="w-60 bg-navy-800 text-white flex flex-col shrink-0">
+        <aside class="w-60 bg-navy-800 text-white flex flex-col shrink-0 sticky top-0 self-start h-[100vh] overflow-y-auto">
             <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10">
                 <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1.5 shrink-0">
                     <img src="{{ asset('images/logo-sman1.png') }}" alt="Logo" class="h-full w-auto">
