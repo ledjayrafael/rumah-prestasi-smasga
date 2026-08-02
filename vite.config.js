@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/guru-dashboard-charts.js',
                 'resources/js/admin-dashboard-charts.js',
+                'resources/js/admin-teachers-table.js',
             ],
             refresh: true,
         }),

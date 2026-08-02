@@ -96,7 +96,7 @@ Route::middleware(['auth', 'password.current', 'role:admin'])
     ->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
 
-        Route::get('/guru/{teacher}/kredensial', [TeacherController::class, 'credentials'])->name('teachers.credentials');
+        Route::post('/guru/{teacher}/reset-password', [TeacherController::class, 'resetPassword'])->name('teachers.reset-password');
 
         Route::resource('kelas', ClassController::class)
             ->parameters(['kelas' => 'class'])
