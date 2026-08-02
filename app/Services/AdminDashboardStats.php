@@ -179,6 +179,15 @@ class AdminDashboardStats
             ['label' => 'Kelola Info Lomba', 'url' => route('admin.competitions.index')],
         ];
 
+        // Dummy sementara: belum ada tautan Achievement -> Competition untuk agregasi nyata.
+        $topCompetitions = [
+            ['name' => 'Olimpiade Sains Nasional (OSN)', 'count' => 24],
+            ['name' => 'Festival dan Lomba Seni Siswa Nasional (FLS2N)', 'count' => 18],
+            ['name' => 'Lomba Debat Bahasa Inggris', 'count' => 15],
+            ['name' => 'Kompetisi Sains Madrasah (KSM)', 'count' => 11],
+            ['name' => 'Lomba Karya Tulis Ilmiah (LKTI)', 'count' => 8],
+        ];
+
         return [
             'header' => [
                 'greeting' => $this->greeting($now),
@@ -196,6 +205,7 @@ class AdminDashboardStats
             ],
             'highlights' => $highlights,
             'leaderboard' => $leaderboard,
+            'top_competitions' => $topCompetitions,
             'actions' => $actions,
         ];
     }

@@ -189,6 +189,31 @@
             </div>
         </div>
 
+        <div class="mt-6 bg-white border border-slate-200 rounded-2xl p-4.5">
+            <div class="text-xs font-semibold text-slate-500 mb-3">Lomba Terbanyak Diikuti</div>
+            @if (empty($dashboard['top_competitions']))
+                <div class="text-sm text-slate-400">Belum ada data lomba.</div>
+            @else
+                @php $maxCompetitionCount = collect($dashboard['top_competitions'])->max('count') ?: 1; @endphp
+                <div class="space-y-3">
+                    @foreach ($dashboard['top_competitions'] as $i => $item)
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full bg-navy-100 text-navy-700 font-mono text-xs font-extrabold flex items-center justify-center shrink-0">{{ $i + 1 }}</div>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center justify-between gap-3">
+                                    <div class="text-sm font-bold text-navy-900 truncate">{{ $item['name'] }}</div>
+                                    <div class="text-sm font-extrabold font-mono text-navy-900 shrink-0">{{ $item['count'] }}</div>
+                                </div>
+                                <div class="h-1.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+                                    <div class="h-full bg-gold-500 rounded-full" style="width: {{ round($item['count'] / $maxCompetitionCount * 100) }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
         <div class="mt-6 flex gap-3">
             @foreach ($dashboard['actions'] as $action)
                 <a href="{{ $action['url'] }}" class="inline-flex items-center gap-2 bg-navy-800 text-white text-sm font-bold px-5 py-3 rounded-xl">
