@@ -50,44 +50,48 @@
             </div>
         @else
             <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                <div class="grid grid-cols-[1.6fr_1fr_0.8fr_1fr] gap-3.5 px-6 py-3 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wide">
-                    <div>Siswa</div><div>NIS</div><div>Status</div><div class="text-right">Aksi</div>
-                </div>
+                <div class="overflow-x-auto">
+                    <div class="min-w-[640px]">
+                        <div class="grid grid-cols-[1.6fr_1fr_0.8fr_1fr] gap-3.5 px-6 py-3 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                            <div>Siswa</div><div>NIS</div><div>Status</div><div class="text-right">Aksi</div>
+                        </div>
 
-                @php $lastClassId = null; @endphp
-                @foreach ($students as $student)
-                    @php $classId = optional($student->studentProfile)->school_class_id; @endphp
-                    @if ($classId !== $lastClassId)
-                        <div class="px-6 py-2 bg-navy-100/50 border-t border-slate-100 text-[11px] font-extrabold text-navy-800 uppercase tracking-wide">
-                            {{ optional($student->studentProfile->schoolClass)->name ?? 'Tanpa kelas' }}
-                        </div>
-                        @php $lastClassId = $classId; @endphp
-                    @endif
-                    <div class="grid grid-cols-[1.6fr_1fr_0.8fr_1fr] gap-3.5 px-6 py-3.5 items-center border-t border-slate-100 hover:bg-slate-50/60 transition-colors">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <div class="w-9 h-9 rounded-lg bg-navy-100 text-navy-800 flex items-center justify-center text-xs font-extrabold shrink-0">
-                                {{ Str::of($student->name)->explode(' ')->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->join('') }}
+                        @php $lastClassId = null; @endphp
+                        @foreach ($students as $student)
+                            @php $classId = optional($student->studentProfile)->school_class_id; @endphp
+                            @if ($classId !== $lastClassId)
+                                <div class="px-6 py-2 bg-navy-100/50 border-t border-slate-100 text-[11px] font-extrabold text-navy-800 uppercase tracking-wide">
+                                    {{ optional($student->studentProfile->schoolClass)->name ?? 'Tanpa kelas' }}
+                                </div>
+                                @php $lastClassId = $classId; @endphp
+                            @endif
+                            <div class="grid grid-cols-[1.6fr_1fr_0.8fr_1fr] gap-3.5 px-6 py-3.5 items-center border-t border-slate-100 hover:bg-slate-50/60 transition-colors">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="w-9 h-9 rounded-lg bg-navy-100 text-navy-800 flex items-center justify-center text-xs font-extrabold shrink-0">
+                                        {{ Str::of($student->name)->explode(' ')->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->join('') }}
+                                    </div>
+                                    <div class="text-sm font-bold text-navy-900 truncate">{{ $student->name }}</div>
+                                </div>
+                                <div class="text-sm font-mono font-semibold text-slate-600">{{ optional($student->studentProfile)->nis }}</div>
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full {{ $student->is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500' }}">
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $student->is_active ? 'bg-green-500' : 'bg-slate-400' }}"></span>
+                                        {{ $student->is_active ? 'Aktif' : 'Nonaktif' }}
+                                    </span>
+                                </div>
+                                <div class="text-right flex justify-end gap-2">
+                                    <a href="{{ route('guru.students.edit', $student) }}"
+                                       class="text-xs font-bold text-navy-800 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 hover:border-navy-800/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-700 focus-visible:ring-offset-1">Ubah</a>
+                                    <form method="POST" action="{{ route('guru.students.destroy', $student) }}" onsubmit="return confirm('Hapus akun siswa ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-xs font-bold text-red-600 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-1">Hapus</button>
+                                    </form>
+                                </div>
                             </div>
-                            <div class="text-sm font-bold text-navy-900 truncate">{{ $student->name }}</div>
-                        </div>
-                        <div class="text-sm font-mono font-semibold text-slate-600">{{ optional($student->studentProfile)->nis }}</div>
-                        <div>
-                            <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full {{ $student->is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500' }}">
-                                <span class="w-1.5 h-1.5 rounded-full {{ $student->is_active ? 'bg-green-500' : 'bg-slate-400' }}"></span>
-                                {{ $student->is_active ? 'Aktif' : 'Nonaktif' }}
-                            </span>
-                        </div>
-                        <div class="text-right flex justify-end gap-2">
-                            <a href="{{ route('guru.students.edit', $student) }}"
-                               class="text-xs font-bold text-navy-800 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 hover:border-navy-800/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-700 focus-visible:ring-offset-1">Ubah</a>
-                            <form method="POST" action="{{ route('guru.students.destroy', $student) }}" onsubmit="return confirm('Hapus akun siswa ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-xs font-bold text-red-600 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-1">Hapus</button>
-                            </form>
-                        </div>
+                        @endforeach
                     </div>
-                @endforeach
+                </div>
             </div>
 
             <div class="mt-4">{{ $students->links() }}</div>

@@ -12,28 +12,32 @@
         <x-flash />
 
         <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-            <div class="grid grid-cols-[1.4fr_1fr_1.4fr_1fr_1fr] gap-3.5 px-6 py-3 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wide">
-                <div>Nama Kelas</div><div>Tingkat</div><div>Wali Kelas</div><div>Jumlah Siswa</div><div class="text-right">Aksi</div>
-            </div>
-
-            @forelse ($classes as $class)
-                <div class="grid grid-cols-[1.4fr_1fr_1.4fr_1fr_1fr] gap-3.5 px-6 py-3.5 items-center border-t border-slate-100">
-                    <div class="text-sm font-bold text-navy-900">{{ $class->name }}</div>
-                    <div class="text-sm font-semibold text-slate-600">Kelas {{ $class->grade_level }}</div>
-                    <div class="text-sm font-semibold text-slate-600">{{ optional($class->homeroomTeacher)->name ?? '—' }}</div>
-                    <div class="text-sm font-semibold text-slate-600">{{ $class->students_count }}</div>
-                    <div class="text-right flex justify-end gap-2">
-                        <a href="{{ route('admin.classes.edit', $class) }}" class="text-xs font-bold text-navy-800 px-3 py-1.5 rounded-lg border border-slate-200">Ubah</a>
-                        <form method="POST" action="{{ route('admin.classes.destroy', $class) }}" onsubmit="return confirm('Hapus kelas ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-xs font-bold text-red-600 px-3 py-1.5 rounded-lg border border-red-200">Hapus</button>
-                        </form>
+            <div class="overflow-x-auto">
+                <div class="min-w-[720px]">
+                    <div class="grid grid-cols-[1.4fr_1fr_1.4fr_1fr_1fr] gap-3.5 px-6 py-3 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                        <div>Nama Kelas</div><div>Tingkat</div><div>Wali Kelas</div><div>Jumlah Siswa</div><div class="text-right">Aksi</div>
                     </div>
+
+                    @forelse ($classes as $class)
+                        <div class="grid grid-cols-[1.4fr_1fr_1.4fr_1fr_1fr] gap-3.5 px-6 py-3.5 items-center border-t border-slate-100">
+                            <div class="text-sm font-bold text-navy-900">{{ $class->name }}</div>
+                            <div class="text-sm font-semibold text-slate-600">Kelas {{ $class->grade_level }}</div>
+                            <div class="text-sm font-semibold text-slate-600">{{ optional($class->homeroomTeacher)->name ?? '—' }}</div>
+                            <div class="text-sm font-semibold text-slate-600">{{ $class->students_count }}</div>
+                            <div class="text-right flex justify-end gap-2">
+                                <a href="{{ route('admin.classes.edit', $class) }}" class="text-xs font-bold text-navy-800 px-3 py-1.5 rounded-lg border border-slate-200">Ubah</a>
+                                <form method="POST" action="{{ route('admin.classes.destroy', $class) }}" onsubmit="return confirm('Hapus kelas ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-xs font-bold text-red-600 px-3 py-1.5 rounded-lg border border-red-200">Hapus</button>
+                                </form>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center text-sm text-slate-400 py-14">Belum ada kelas. Tambahkan kelas pertama.</div>
+                    @endforelse
                 </div>
-            @empty
-                <div class="text-center text-sm text-slate-400 py-14">Belum ada kelas. Tambahkan kelas pertama.</div>
-            @endforelse
+            </div>
         </div>
     </div>
 @endsection

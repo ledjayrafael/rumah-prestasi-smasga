@@ -140,45 +140,49 @@
                             </div>
 
                             <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                                <div class="grid grid-cols-[0.4fr_1.6fr_1fr_1.2fr_0.8fr] gap-3.5 px-6 py-3 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wide items-center">
-                                    <div>
-                                        <input type="checkbox" id="select-all" class="w-4 h-4 rounded border-slate-300 text-navy-800 focus:ring-navy-700">
-                                    </div>
-                                    <div>Siswa</div><div>NIS</div><div>Kelas</div><div>Status</div>
-                                </div>
-
-                                @foreach ($students as $student)
-                                    @php $schoolClass = optional($student->studentProfile)->schoolClass; @endphp
-                                    <div class="grid grid-cols-[0.4fr_1.6fr_1fr_1.2fr_0.8fr] gap-3.5 px-6 py-3.5 items-center border-t border-slate-100 hover:bg-slate-50/60 transition-colors">
-                                        <div>
-                                            <input type="checkbox" name="student_ids[]" value="{{ $student->id }}"
-                                                   class="student-checkbox w-4 h-4 rounded border-slate-300 text-navy-800 focus:ring-navy-700">
-                                        </div>
-                                        <div class="flex items-center gap-2.5 min-w-0">
-                                            <div class="w-9 h-9 rounded-lg bg-navy-100 text-navy-800 flex items-center justify-center text-xs font-extrabold shrink-0">
-                                                {{ Str::of($student->name)->explode(' ')->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->join('') }}
+                                <div class="overflow-x-auto">
+                                    <div class="min-w-[720px]">
+                                        <div class="grid grid-cols-[0.4fr_1.6fr_1fr_1.2fr_0.8fr] gap-3.5 px-6 py-3 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wide items-center">
+                                            <div>
+                                                <input type="checkbox" id="select-all" class="w-4 h-4 rounded border-slate-300 text-navy-800 focus:ring-navy-700">
                                             </div>
-                                            <div class="text-sm font-bold text-navy-900 truncate">{{ $student->name }}</div>
+                                            <div>Siswa</div><div>NIS</div><div>Kelas</div><div>Status</div>
                                         </div>
-                                        <div class="text-sm font-mono font-semibold text-slate-600">{{ optional($student->studentProfile)->nis }}</div>
-                                        <div>
-                                            @if ($schoolClass)
-                                                <span class="text-sm font-semibold text-slate-600">{{ $schoolClass->name }}</span>
-                                            @else
-                                                <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full bg-gold-100 text-gold-600">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-gold-500"></span>
-                                                    Belum ada kelas
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <div>
-                                            <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full {{ $student->is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500' }}">
-                                                <span class="w-1.5 h-1.5 rounded-full {{ $student->is_active ? 'bg-green-500' : 'bg-slate-400' }}"></span>
-                                                {{ $student->is_active ? 'Aktif' : 'Nonaktif' }}
-                                            </span>
-                                        </div>
+
+                                        @foreach ($students as $student)
+                                            @php $schoolClass = optional($student->studentProfile)->schoolClass; @endphp
+                                            <div class="grid grid-cols-[0.4fr_1.6fr_1fr_1.2fr_0.8fr] gap-3.5 px-6 py-3.5 items-center border-t border-slate-100 hover:bg-slate-50/60 transition-colors">
+                                                <div>
+                                                    <input type="checkbox" name="student_ids[]" value="{{ $student->id }}"
+                                                           class="student-checkbox w-4 h-4 rounded border-slate-300 text-navy-800 focus:ring-navy-700">
+                                                </div>
+                                                <div class="flex items-center gap-2.5 min-w-0">
+                                                    <div class="w-9 h-9 rounded-lg bg-navy-100 text-navy-800 flex items-center justify-center text-xs font-extrabold shrink-0">
+                                                        {{ Str::of($student->name)->explode(' ')->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->join('') }}
+                                                    </div>
+                                                    <div class="text-sm font-bold text-navy-900 truncate">{{ $student->name }}</div>
+                                                </div>
+                                                <div class="text-sm font-mono font-semibold text-slate-600">{{ optional($student->studentProfile)->nis }}</div>
+                                                <div>
+                                                    @if ($schoolClass)
+                                                        <span class="text-sm font-semibold text-slate-600">{{ $schoolClass->name }}</span>
+                                                    @else
+                                                        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full bg-gold-100 text-gold-600">
+                                                            <span class="w-1.5 h-1.5 rounded-full bg-gold-500"></span>
+                                                            Belum ada kelas
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <div>
+                                                    <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full {{ $student->is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500' }}">
+                                                        <span class="w-1.5 h-1.5 rounded-full {{ $student->is_active ? 'bg-green-500' : 'bg-slate-400' }}"></span>
+                                                        {{ $student->is_active ? 'Aktif' : 'Nonaktif' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
-                                @endforeach
+                                </div>
                             </div>
                         </form>
 

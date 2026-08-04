@@ -26,8 +26,8 @@ class DatabaseSeeder extends Seeder
 
         $admin = User::create([
             'name' => 'Bambang Wijaya',
-            'username' => 'admin@sman1tenggarang.sch.id',
-            'email' => 'admin@sman1tenggarang.sch.id',
+            'username' => 'admin@smasga.sch.id',
+            'email' => 'admin@smasga.sch.id',
             'role' => UserRole::Admin,
             'password' => 'password',
             'must_change_password' => false,
@@ -41,8 +41,8 @@ class DatabaseSeeder extends Seeder
 
         $guru = User::create([
             'name' => 'Siti Rahayu, S.Pd.',
-            'username' => 'siti.rahayu@sman1tenggarang.sch.id',
-            'email' => 'siti.rahayu@sman1tenggarang.sch.id',
+            'username' => 'siti.rahayu@smasga.sch.id',
+            'email' => 'siti.rahayu@smasga.sch.id',
             'role' => UserRole::Guru,
             'password' => 'password',
             'must_change_password' => false,

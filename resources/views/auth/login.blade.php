@@ -14,12 +14,12 @@
                 <div class="space-y-3">
                     <div>
                         <p class="font-semibold text-navy-800">Admin</p>
-                        <p class="text-slate-500">admin@sman1tenggarang.sch.id</p>
+                        <p class="text-slate-500">admin@smasga.sch.id</p>
                         <p class="text-slate-500">password</p>
                     </div>
                     <div>
                         <p class="font-semibold text-navy-800">Guru</p>
-                        <p class="text-slate-500">siti.rahayu@sman1tenggarang.sch.id</p>
+                        <p class="text-slate-500">siti.rahayu@smasga.sch.id</p>
                         <p class="text-slate-500">password</p>
                     </div>
                     <div>

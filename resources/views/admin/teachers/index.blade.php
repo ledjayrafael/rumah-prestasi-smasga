@@ -12,42 +12,54 @@
         <x-flash />
 
         <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden" data-sortable-table>
-            <div class="grid grid-cols-[1.3fr_1.3fr_0.8fr_1.2fr_0.7fr_1.9fr] gap-3.5 px-6 py-3 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wide">
-                <button type="button" data-sort-col="0" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Guru <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
-                <button type="button" data-sort-col="1" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Email <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
-                <button type="button" data-sort-col="2" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Peran <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
-                <button type="button" data-sort-col="3" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Kelas Binaan <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
-                <button type="button" data-sort-col="4" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Status <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
-                <div class="text-right">Aksi</div>
-            </div>
+            <div class="overflow-x-auto">
+                <div class="min-w-[880px]">
+                    <div class="grid grid-cols-[1.3fr_1.3fr_0.8fr_1.2fr_0.7fr_1.9fr] gap-3.5 px-6 py-3 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                        <button type="button" data-sort-col="0" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Guru <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
+                        <button type="button" data-sort-col="1" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Email <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
+                        <button type="button" data-sort-col="2" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Peran <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
+                        <button type="button" data-sort-col="3" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Kelas Binaan <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
+                        <button type="button" data-sort-col="4" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Status <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
+                        <div class="text-right">Aksi</div>
+                    </div>
 
-            @forelse ($teachers as $teacher)
-                <div class="grid grid-cols-[1.3fr_1.3fr_0.8fr_1.2fr_0.7fr_1.9fr] gap-3.5 px-6 py-3.5 items-center border-t border-slate-100" data-table-row>
-                    <div class="text-sm font-bold text-navy-900">{{ $teacher->name }}</div>
-                    <div class="text-sm text-slate-600">{{ $teacher->email }}</div>
-                    <div class="text-sm font-semibold text-slate-600">{{ optional($teacher->teacherProfile)->position?->label() }}</div>
-                    <div class="text-sm text-slate-600">{{ $teacher->taughtClasses->pluck('name')->join(', ') ?: '—' }}</div>
-                    <div>
-                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $teacher->is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500' }}">
-                            {{ $teacher->is_active ? 'Aktif' : 'Nonaktif' }}
-                        </span>
-                    </div>
-                    <div class="text-right flex justify-end gap-2">
-                        <a href="{{ route('admin.teachers.edit', $teacher) }}" class="text-xs font-bold text-navy-800 px-3 py-1.5 rounded-lg border border-slate-200">Ubah</a>
-                        <form method="POST" action="{{ route('admin.teachers.reset-password', $teacher) }}" data-reset-password-form data-teacher-name="{{ $teacher->name }}">
-                            @csrf
-                            <button type="submit" class="text-xs font-bold text-amber-700 px-3 py-1.5 rounded-lg border border-amber-200">Reset Password</button>
-                        </form>
-                        <form method="POST" action="{{ route('admin.teachers.destroy', $teacher) }}" onsubmit="return confirm('Hapus akun guru ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-xs font-bold text-red-600 px-3 py-1.5 rounded-lg border border-red-200">Hapus</button>
-                        </form>
-                    </div>
+                    @forelse ($teachers as $teacher)
+                        <div class="grid grid-cols-[1.3fr_1.3fr_0.8fr_1.2fr_0.7fr_1.9fr] gap-3.5 px-6 py-3.5 items-center border-t border-slate-100" data-table-row>
+                            <div class="text-sm font-bold text-navy-900">{{ $teacher->name }}</div>
+                            <div class="text-sm text-slate-600">{{ $teacher->email }}</div>
+                            <div class="text-sm font-semibold text-slate-600">{{ optional($teacher->teacherProfile)->position?->label() }}</div>
+                            <div class="text-sm text-slate-600">{{ $teacher->taughtClasses->pluck('name')->join(', ') ?: '—' }}</div>
+                            <div>
+                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $teacher->is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500' }}">
+                                    {{ $teacher->is_active ? 'Aktif' : 'Nonaktif' }}
+                                </span>
+                            </div>
+                            <div class="text-right flex justify-end gap-2">
+                                <a href="{{ route('admin.teachers.edit', $teacher) }}" class="text-xs font-bold text-navy-800 px-3 py-1.5 rounded-lg border border-slate-200">Ubah</a>
+                                <form method="POST" action="{{ route('admin.teachers.reset-password', $teacher) }}" data-reset-password-form data-teacher-name="{{ $teacher->name }}">
+                                    @csrf
+                                    <button type="submit" class="text-xs font-bold text-amber-700 px-3 py-1.5 rounded-lg border border-amber-200">Reset Password</button>
+                                </form>
+                                <form method="POST" action="{{ route('admin.teachers.destroy', $teacher) }}" onsubmit="return confirm('Hapus akun guru ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" aria-label="Hapus" title="Hapus"
+                                            class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-1">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M3 6h18"/>
+                                            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                            <path d="M10 11v6M14 11v6"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center text-sm text-slate-400 py-14">Belum ada akun guru.</div>
+                    @endforelse
                 </div>
-            @empty
-                <div class="text-center text-sm text-slate-400 py-14">Belum ada akun guru.</div>
-            @endforelse
+            </div>
         </div>
 
         <div class="mt-4">{{ $teachers->links() }}</div>
