@@ -65,8 +65,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="mt-4">{{ $teachers->links() }}</div>
     </div>
 
     <div id="reset-password-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-navy-950/40 px-4">

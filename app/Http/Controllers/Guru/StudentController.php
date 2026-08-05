@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class StudentController extends Controller
@@ -79,6 +80,24 @@ class StudentController extends Controller
         $credential = Cache::pull("temp_credential:{$student->id}");
 
         return view('guru.students.credentials', compact('credential'));
+    }
+
+    public function resetPassword(User $student): RedirectResponse
+    {
+        abort_unless(Auth::user()->canManageStudent($student), 404);
+
+        $temporaryPassword = Str::password(10, symbols: false);
+
+        $student->update([
+            'password' => $temporaryPassword,
+            'must_change_password' => true,
+        ]);
+
+        return redirect()->route('guru.students.index')->with('credential', [
+            'name' => $student->name,
+            'login' => $student->username,
+            'password' => $temporaryPassword,
+        ]);
     }
 
     public function edit(User $student): View

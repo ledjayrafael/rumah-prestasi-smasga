@@ -103,6 +103,10 @@
                                 <div class="text-right flex justify-end gap-2">
                                     <a href="{{ route('guru.students.edit', $student) }}"
                                        class="text-xs font-bold text-navy-800 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 hover:border-navy-800/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-700 focus-visible:ring-offset-1">Ubah</a>
+                                    <form method="POST" action="{{ route('guru.students.reset-password', $student) }}" data-reset-password-form data-student-name="{{ $student->name }}">
+                                        @csrf
+                                        <button type="submit" class="text-xs font-bold text-amber-700 px-3 py-1.5 rounded-lg border border-amber-200 hover:bg-amber-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-1">Reset Password</button>
+                                    </form>
                                     <form method="POST" action="{{ route('guru.students.destroy', $student) }}" onsubmit="return confirm('Hapus akun siswa ini?');">
                                         @csrf
                                         @method('DELETE')
@@ -116,11 +120,49 @@
             </div>
         @endif
     </div>
+
+    <div id="reset-password-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-navy-950/40 px-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">
+            <h2 class="text-base font-extrabold text-navy-900 mb-2">Reset Password Siswa?</h2>
+            <p class="text-sm text-slate-600 mb-5">
+                Password baru akan dibuat untuk <span id="reset-password-modal-name" class="font-bold text-navy-900"></span>.
+                Password lama tidak akan berlaku lagi dan siswa wajib membuat password baru saat login berikutnya.
+            </p>
+            <div class="flex justify-end gap-2">
+                <button type="button" id="reset-password-modal-cancel" class="text-sm font-bold text-slate-500 px-4 py-2 rounded-xl border border-slate-200">Batal</button>
+                <button type="button" id="reset-password-modal-confirm" class="text-sm font-bold text-white bg-amber-600 px-4 py-2 rounded-xl">Ya, Reset Password</button>
+            </div>
+        </div>
+    </div>
+
+    @if (session('credential'))
+        <div id="credential-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-navy-950/40 px-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                <h2 class="text-base font-extrabold text-navy-900 mb-1">Kredensial Akun Siswa</h2>
+                <p class="text-xs font-semibold text-red-600 mb-4">Salin sekarang — kredensial ini tidak akan ditampilkan lagi.</p>
+
+                <dl class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-900 space-y-2 mb-4">
+                    <div><dt class="text-xs font-bold text-amber-800/70">Nama</dt><dd class="font-semibold">{{ session('credential')['name'] }}</dd></div>
+                    <div><dt class="text-xs font-bold text-amber-800/70">Login (NIS)</dt><dd class="font-mono font-bold">{{ session('credential')['login'] }}</dd></div>
+                    <div><dt class="text-xs font-bold text-amber-800/70">Password sementara</dt><dd class="font-mono font-bold">{{ session('credential')['password'] }}</dd></div>
+                </dl>
+
+                <p class="text-xs text-slate-500 mb-5">Siswa wajib ganti password saat login berikutnya.</p>
+
+                <div class="flex justify-end">
+                    <button type="button" id="credential-modal-close" class="text-sm font-bold text-white bg-navy-800 px-4 py-2 rounded-xl">Tutup</button>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
 
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            initResetPasswordModal();
+            initCredentialModal();
+
             const MAX_SELECTED = 50;
             const checkboxes = Array.from(document.querySelectorAll('.student-checkbox'));
             const selectAll = document.getElementById('select-all');
@@ -189,5 +231,56 @@
 
             refreshUi();
         });
+
+        function initResetPasswordModal() {
+            const modal = document.getElementById('reset-password-modal');
+            if (!modal) return;
+
+            const nameEl = document.getElementById('reset-password-modal-name');
+            const confirmBtn = document.getElementById('reset-password-modal-confirm');
+            const cancelBtn = document.getElementById('reset-password-modal-cancel');
+            let pendingForm = null;
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                pendingForm = null;
+            };
+
+            document.querySelectorAll('[data-reset-password-form]').forEach((form) => {
+                form.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    pendingForm = form;
+                    nameEl.textContent = form.dataset.studentName ?? '';
+                    modal.classList.remove('hidden');
+                });
+            });
+
+            cancelBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) closeModal();
+            });
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+            });
+            confirmBtn.addEventListener('click', () => {
+                pendingForm?.submit();
+            });
+        }
+
+        function initCredentialModal() {
+            const modal = document.getElementById('credential-modal');
+            if (!modal) return;
+
+            const closeBtn = document.getElementById('credential-modal-close');
+            const closeModal = () => modal.remove();
+
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) closeModal();
+            });
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && document.body.contains(modal)) closeModal();
+            });
+        }
     </script>
 @endpush

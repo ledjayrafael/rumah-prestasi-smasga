@@ -21,7 +21,7 @@ class TeacherController extends Controller
             ->where('role', UserRole::Guru)
             ->with(['teacherProfile', 'taughtClasses'])
             ->orderBy('name')
-            ->paginate(15);
+            ->get();
 
         return view('admin.teachers.index', compact('teachers'));
     }
