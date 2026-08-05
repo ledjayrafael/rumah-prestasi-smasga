@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Dashboard') — Portal Prestasi</title>
+    <title>@yield('title', 'Dashboard') — Rumah Prestasi</title>
     @vite(['resources/css/app.css'])
 </head>
 <body class="bg-[#F4F5FA] text-navy-900">
@@ -15,7 +15,7 @@
                 </div>
                 <div class="min-w-0">
                     <div class="text-xs font-extrabold truncate">SMAN 1 Tenggarang</div>
-                    <div class="text-[11px] text-white/60">Portal Prestasi</div>
+                    <div class="text-[11px] text-white/60">Rumah Prestasi</div>
                 </div>
             </div>
 
@@ -44,6 +44,8 @@
                     <div class="text-[11px] text-white/60 truncate">
                         @if (auth()->user()->isGuru())
                             {{ optional(auth()->user()->teacherProfile)->position?->label() }}
+                        @elseif (auth()->user()->isDeveloper())
+                            Developer
                         @else
                             Admin Sekolah
                         @endif

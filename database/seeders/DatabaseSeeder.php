@@ -33,6 +33,15 @@ class DatabaseSeeder extends Seeder
             'must_change_password' => false,
         ]);
 
+        User::create([
+            'name' => 'Developer SMASGA',
+            'username' => 'developer@smasga.sch.id',
+            'email' => 'developer@smasga.sch.id',
+            'role' => UserRole::Developer,
+            'password' => 'password',
+            'must_change_password' => false,
+        ]);
+
         $kelasXiMipa2 = SchoolClass::create([
             'name' => 'XI MIPA 2',
             'grade_level' => 'XI',

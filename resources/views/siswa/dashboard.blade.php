@@ -11,7 +11,7 @@
             </div>
             <div>
                 <div class="text-xs font-semibold opacity-70">SMAN 1 Tenggarang</div>
-                <div class="text-sm font-bold">Portal Prestasi Siswa</div>
+                <div class="text-sm font-bold">Rumah Prestasi Siswa</div>
             </div>
         </div>
         <div class="mt-5 relative">

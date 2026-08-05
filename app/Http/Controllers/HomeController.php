@@ -18,7 +18,7 @@ class HomeController extends Controller
         return match ($user->role) {
             UserRole::Siswa => redirect()->route('siswa.dashboard'),
             UserRole::Guru => redirect()->route('guru.dashboard'),
-            UserRole::Admin => redirect()->route('admin.dashboard'),
+            UserRole::Admin, UserRole::Developer => redirect()->route('admin.dashboard'),
         };
     }
 }

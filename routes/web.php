@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AchievementFileController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\ClassController;
 use App\Http\Controllers\Admin\CompetitionController as AdminCompetitionController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\PasswordController as AdminPasswordController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -92,29 +94,43 @@ Route::middleware(['auth', 'password.current', 'role:guru'])
         });
     });
 
-Route::middleware(['auth', 'password.current', 'role:admin'])
+Route::middleware(['auth', 'password.current', 'role:admin,developer'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
 
-        Route::post('/guru/{teacher}/reset-password', [TeacherController::class, 'resetPassword'])->name('teachers.reset-password');
+        Route::get('/ganti-password', [AdminPasswordController::class, 'edit'])->name('password.edit');
+        Route::put('/ganti-password', [AdminPasswordController::class, 'update'])->name('password.update');
 
-        Route::resource('kelas', ClassController::class)
-            ->parameters(['kelas' => 'class'])
-            ->names('classes')
-            ->except(['show']);
-
-        Route::resource('guru', TeacherController::class)
-            ->parameters(['guru' => 'teacher'])
-            ->names('teachers')
-            ->except(['show']);
-
+        Route::get('/kelas', [ClassController::class, 'index'])->name('classes.index');
+        Route::get('/guru', [TeacherController::class, 'index'])->name('teachers.index');
         Route::get('/siswa', [AdminStudentController::class, 'index'])->name('students.index');
-        Route::post('/siswa/pindah-kelas', [AdminStudentController::class, 'bulkMove'])->name('students.bulk-move');
+        Route::get('/info-lomba', [AdminCompetitionController::class, 'index'])->name('competitions.index');
 
-        Route::resource('info-lomba', AdminCompetitionController::class)
-            ->parameters(['info-lomba' => 'competition'])
-            ->names('competitions')
-            ->except(['show']);
+        Route::middleware('role:admin')->group(function () {
+            Route::post('/guru/{teacher}/reset-password', [TeacherController::class, 'resetPassword'])->name('teachers.reset-password');
+
+            Route::resource('kelas', ClassController::class)
+                ->parameters(['kelas' => 'class'])
+                ->names('classes')
+                ->except(['show', 'index']);
+
+            Route::resource('guru', TeacherController::class)
+                ->parameters(['guru' => 'teacher'])
+                ->names('teachers')
+                ->except(['show', 'index']);
+
+            Route::post('/siswa/pindah-kelas', [AdminStudentController::class, 'bulkMove'])->name('students.bulk-move');
+
+            Route::resource('info-lomba', AdminCompetitionController::class)
+                ->parameters(['info-lomba' => 'competition'])
+                ->names('competitions')
+                ->except(['show', 'index']);
+        });
+
+        Route::middleware('role:developer')->group(function () {
+            Route::post('/admins/{admin}/reset-password', [AdminUserController::class, 'resetPassword'])->name('admins.reset-password');
+            Route::resource('admins', AdminUserController::class)->except(['show']);
+        });
     });

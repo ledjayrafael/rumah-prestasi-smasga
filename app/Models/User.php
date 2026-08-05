@@ -105,6 +105,11 @@ class User extends Authenticatable
         return $this->role === UserRole::Admin;
     }
 
+    public function isDeveloper(): bool
+    {
+        return $this->role === UserRole::Developer;
+    }
+
     public function isWaliKelas(): bool
     {
         if ($this->role !== UserRole::Guru) {

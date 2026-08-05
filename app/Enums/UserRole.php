@@ -7,6 +7,7 @@ enum UserRole: string
     case Siswa = 'siswa';
     case Guru = 'guru';
     case Admin = 'admin';
+    case Developer = 'developer';
 
     public function label(): string
     {
@@ -14,6 +15,7 @@ enum UserRole: string
             self::Siswa => 'Siswa',
             self::Guru => 'Guru',
             self::Admin => 'Admin Sekolah',
+            self::Developer => 'Developer',
         };
     }
 }

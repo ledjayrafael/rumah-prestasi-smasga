@@ -79,7 +79,7 @@
         </form>
     </div>
 
-    <p class="text-center text-xs text-slate-400 mt-6">Portal Prestasi SMAN 1 Tenggarang &middot; v1.0</p>
+    <p class="text-center text-xs text-slate-400 mt-6">Rumah Prestasi SMAN 1 Tenggarang &middot; v1.0</p>
     <p class="text-center text-xs text-slate-400 mt-1">
         Copyright &copy; {{ date('Y') }}
         <a href="https://cvsatriateknologi.com/" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-navy-700 underline">CV SATRIA TEKNOLOGI</a>

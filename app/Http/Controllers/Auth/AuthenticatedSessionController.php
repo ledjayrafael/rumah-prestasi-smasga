@@ -57,7 +57,7 @@ class AuthenticatedSessionController extends Controller
         return match ($role) {
             UserRole::Siswa => route('siswa.dashboard'),
             UserRole::Guru => route('guru.dashboard'),
-            UserRole::Admin => route('admin.dashboard'),
+            UserRole::Admin, UserRole::Developer => route('admin.dashboard'),
         };
     }
 }

@@ -33,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('navItems', match ($user->role) {
                 UserRole::Guru => $this->guruNavItems($user),
                 UserRole::Admin => $this->adminNavItems(),
+                UserRole::Developer => $this->developerNavItems(),
                 default => [],
             });
         });
@@ -106,6 +107,31 @@ class AppServiceProvider extends ServiceProvider
                 'active' => request()->routeIs('admin.competitions.*'),
                 'icon' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>',
             ],
+            [
+                'label' => 'Ganti Password',
+                'url' => route('admin.password.edit'),
+                'active' => request()->routeIs('admin.password.*'),
+                'icon' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+            ],
         ];
+    }
+
+    private function developerNavItems(): array
+    {
+        $items = $this->adminNavItems();
+
+        // Sisipkan "Kelola Admin" sebelum "Ganti Password"
+        $passwordItem = array_pop($items);
+
+        $items[] = [
+            'label' => 'Kelola Admin',
+            'url' => route('admin.admins.index'),
+            'active' => request()->routeIs('admin.admins.*'),
+            'icon' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>',
+        ];
+
+        $items[] = $passwordItem;
+
+        return $items;
     }
 }

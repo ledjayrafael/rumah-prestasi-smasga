@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('username')->unique()->comment('NIS untuk siswa, email untuk guru/admin');
             $table->string('email')->nullable()->unique();
             $table->string('phone', 20)->nullable();
-            $table->enum('role', ['siswa', 'guru', 'admin'])->default('siswa');
+            $table->enum('role', ['siswa', 'guru', 'admin', 'developer'])->default('siswa');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('must_change_password')->default(true);

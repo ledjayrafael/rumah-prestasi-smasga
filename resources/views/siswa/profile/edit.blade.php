@@ -200,7 +200,7 @@
     </form>
 
     <div class="text-center text-[11px] text-slate-400 font-semibold mt-5">
-        Portal Prestasi SMAN 1 Tenggarang &middot; v1.0
+        Rumah Prestasi SMAN 1 Tenggarang &middot; v1.0
     </div>
     <div class="text-center text-[11px] text-slate-400 mt-1 pb-1">
         Copyright &copy; {{ date('Y') }}
