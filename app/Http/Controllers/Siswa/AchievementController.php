@@ -8,6 +8,7 @@ use App\Http\Requests\StoreAchievementRequest;
 use App\Http\Requests\UpdateAchievementRequest;
 use App\Models\Achievement;
 use App\Notifications\NewAchievementSubmitted;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Throwable;
 
 class AchievementController extends Controller
 {
@@ -48,17 +50,26 @@ class AchievementController extends Controller
         return view('siswa.achievements.create');
     }
 
-    public function store(StoreAchievementRequest $request): RedirectResponse
+    public function store(StoreAchievementRequest $request): RedirectResponse|JsonResponse
     {
-        $achievement = DB::transaction(function () use ($request) {
-            $achievement = Auth::user()->achievements()->create($request->safe()->except('files'));
+        $storedPaths = [];
 
-            $this->storeUploadedFiles($achievement, $request->file('files', []));
+        try {
+            $achievement = DB::transaction(function () use ($request, &$storedPaths) {
+                $achievement = Auth::user()->achievements()->create($request->safe()->except('files'));
 
-            return $achievement;
-        });
+                $this->storeUploadedFiles($achievement, $request->file('files', []), $storedPaths);
 
-        $this->notifyClassTeachers($achievement);
+                return $achievement;
+            });
+        } catch (Throwable $e) {
+            $this->cleanupStoredFiles($storedPaths);
+            report($e);
+
+            return $this->submissionFailedResponse($request);
+        }
+
+        $this->notifyClassTeachersSafely($achievement);
 
         return redirect()->route('siswa.achievements.index')
             ->with('status', 'Prestasi berhasil diajukan dan menunggu verifikasi guru.');
@@ -81,34 +92,47 @@ class AchievementController extends Controller
         return view('siswa.achievements.edit', compact('achievement'));
     }
 
-    public function update(UpdateAchievementRequest $request, Achievement $achievement): RedirectResponse
+    public function update(UpdateAchievementRequest $request, Achievement $achievement): RedirectResponse|JsonResponse
     {
         abort_unless($achievement->student_id === Auth::id(), 403);
         abort_unless($achievement->status === AchievementStatus::Revision, 403);
 
-        DB::transaction(function () use ($request, $achievement) {
-            $achievement->update([
-                ...$request->safe()->except('files'),
-                'status' => AchievementStatus::Pending,
-                'reviewer_notes' => null,
-                'reviewed_by' => null,
-                'reviewed_at' => null,
-            ]);
+        $newPaths = [];
+        $oldPaths = [];
 
-            $uploaded = array_filter($request->file('files', []) ?? []);
+        try {
+            DB::transaction(function () use ($request, $achievement, &$newPaths, &$oldPaths) {
+                $achievement->update([
+                    ...$request->safe()->except('files'),
+                    'status' => AchievementStatus::Pending,
+                    'reviewer_notes' => null,
+                    'reviewed_by' => null,
+                    'reviewed_at' => null,
+                ]);
 
-            if ($uploaded !== []) {
-                foreach ($achievement->files as $existing) {
-                    Storage::disk('local')->delete($existing->path);
-                    $existing->delete();
+                $uploaded = array_filter($request->file('files', []) ?? []);
+
+                if ($uploaded !== []) {
+                    // Keep the old files on disk until the new ones are confirmed
+                    // stored, so a mid-upload failure (factor X) can't wipe out
+                    // evidence the student already had approved for revision.
+                    $oldPaths = $achievement->files->pluck('path')->all();
+                    $achievement->files()->delete();
+
+                    $this->storeUploadedFiles($achievement, $uploaded, $newPaths);
                 }
+            });
+        } catch (Throwable $e) {
+            $this->cleanupStoredFiles($newPaths);
+            report($e);
 
-                $this->storeUploadedFiles($achievement, $uploaded);
-            }
-        });
+            return $this->submissionFailedResponse($request);
+        }
+
+        $this->cleanupStoredFiles($oldPaths);
 
         $achievement->refresh();
-        $this->notifyClassTeachers($achievement);
+        $this->notifyClassTeachersSafely($achievement);
 
         return redirect()->route('siswa.achievements.show', $achievement)
             ->with('status', 'Perbaikan prestasi dikirim ulang dan menunggu verifikasi guru.');
@@ -116,8 +140,11 @@ class AchievementController extends Controller
 
     /**
      * @param  list<UploadedFile|null>  $files
+     * @param  list<string>  $storedPaths  appended to as each file is written, by
+     *                                     reference, so a mid-loop failure still
+     *                                     leaves the caller able to clean up
      */
-    private function storeUploadedFiles(Achievement $achievement, array $files): void
+    private function storeUploadedFiles(Achievement $achievement, array $files, array &$storedPaths): void
     {
         foreach ($files as $file) {
             if (! $file instanceof UploadedFile || ! $file->isValid()) {
@@ -125,6 +152,7 @@ class AchievementController extends Controller
             }
 
             $path = $file->store('bukti-prestasi', 'local');
+            $storedPaths[] = $path;
 
             $achievement->files()->create([
                 'path' => $path,
@@ -135,6 +163,29 @@ class AchievementController extends Controller
         }
     }
 
+    /**
+     * @param  list<string>  $paths
+     */
+    private function cleanupStoredFiles(array $paths): void
+    {
+        foreach ($paths as $path) {
+            Storage::disk('local')->delete($path);
+        }
+    }
+
+    /**
+     * Notification delivery (mail/db) shouldn't undo an already-saved
+     * submission, so failures here are logged instead of bubbled up.
+     */
+    private function notifyClassTeachersSafely(Achievement $achievement): void
+    {
+        try {
+            $this->notifyClassTeachers($achievement);
+        } catch (Throwable $e) {
+            report($e);
+        }
+    }
+
     private function notifyClassTeachers(Achievement $achievement): void
     {
         $classTeachers = $achievement->student->studentProfile?->schoolClass?->teachers;
@@ -142,5 +193,16 @@ class AchievementController extends Controller
         if ($classTeachers && $classTeachers->isNotEmpty()) {
             Notification::send($classTeachers, new NewAchievementSubmitted($achievement));
         }
+    }
+
+    private function submissionFailedResponse(Request $request): RedirectResponse|JsonResponse
+    {
+        $message = 'Terjadi kesalahan pada server saat menyimpan prestasi. Data yang sudah Anda isi tidak hilang — silakan coba kirim lagi.';
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => $message], 500);
+        }
+
+        return redirect()->back()->withInput()->with('error', $message);
     }
 }
