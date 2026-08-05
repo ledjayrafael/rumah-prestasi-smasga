@@ -128,4 +128,59 @@ class StudentAccessTest extends TestCase
 
         $this->assertDatabaseMissing('student_profiles', ['nis' => '44444']);
     }
+
+    public function test_wali_kelas_can_bulk_delete_homeroom_students(): void
+    {
+        $wali = User::where('role', UserRole::Guru)->firstOrFail();
+        $homeroomClass = $wali->homeroomClasses()->firstOrFail();
+
+        $students = collect(range(0, 1))->map(fn (int $i) => User::factory()->create([
+            'role' => UserRole::Siswa,
+            'username' => '7000'.$i,
+            'password' => 'password',
+        ]));
+        $students->each(fn (User $student, int $i) => $student->studentProfile()->create([
+            'nis' => '7000'.$i,
+            'school_class_id' => $homeroomClass->id,
+        ]));
+
+        $this->actingAs($wali)
+            ->post(route('guru.students.bulk-destroy'), [
+                'student_ids' => $students->pluck('id')->all(),
+            ])
+            ->assertRedirect();
+
+        foreach ($students as $student) {
+            $this->assertDatabaseMissing('users', ['id' => $student->id]);
+        }
+    }
+
+    public function test_wali_kelas_cannot_bulk_delete_students_from_other_class(): void
+    {
+        $wali = User::where('role', UserRole::Guru)->firstOrFail();
+
+        $otherClass = SchoolClass::create([
+            'name' => 'XII IPS 3',
+            'grade_level' => 'XII',
+            'major' => 'IPS',
+        ]);
+
+        $otherStudent = User::factory()->create([
+            'role' => UserRole::Siswa,
+            'username' => '77777',
+            'password' => 'password',
+        ]);
+        $otherStudent->studentProfile()->create([
+            'nis' => '77777',
+            'school_class_id' => $otherClass->id,
+        ]);
+
+        $this->actingAs($wali)
+            ->post(route('guru.students.bulk-destroy'), [
+                'student_ids' => [$otherStudent->id],
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('users', ['id' => $otherStudent->id]);
+    }
 }

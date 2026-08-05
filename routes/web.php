@@ -84,6 +84,7 @@ Route::middleware(['auth', 'password.current', 'role:guru'])
                 ->middleware('throttle:3,1')
                 ->name('students.import.store');
             Route::get('/siswa/{student}/kredensial', [GuruStudentController::class, 'credentials'])->name('students.credentials');
+            Route::post('/siswa/bulk-hapus', [GuruStudentController::class, 'bulkDestroy'])->name('students.bulk-destroy');
             Route::resource('siswa', GuruStudentController::class)
                 ->parameters(['siswa' => 'student'])
                 ->names('students')

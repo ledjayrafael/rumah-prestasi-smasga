@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Guru;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Guru\BulkDestroyStudentsRequest;
 use App\Http\Requests\Guru\StoreStudentRequest;
 use App\Http\Requests\Guru\UpdateStudentRequest;
 use App\Models\User;
@@ -30,7 +31,7 @@ class StudentController extends Controller
             ->orderBy('school_classes.name')
             ->orderBy('users.name')
             ->select('users.*')
-            ->paginate(15);
+            ->get();
 
         $homeroomClasses = Auth::user()
             ->homeroomClasses()
@@ -123,5 +124,25 @@ class StudentController extends Controller
         $student->delete();
 
         return back()->with('status', 'Akun siswa berhasil dihapus.');
+    }
+
+    public function bulkDestroy(BulkDestroyStudentsRequest $request): RedirectResponse
+    {
+        $validated = $request->validated();
+        $classIds = Auth::user()->manageableClassIds();
+
+        $deleted = DB::transaction(function () use ($validated, $classIds) {
+            $students = User::query()
+                ->where('role', UserRole::Siswa)
+                ->whereIn('id', $validated['student_ids'])
+                ->whereHas('studentProfile', fn ($q) => $q->whereIn('school_class_id', $classIds))
+                ->get();
+
+            $students->each->delete();
+
+            return $students->count();
+        });
+
+        return back()->with('status', "{$deleted} akun siswa berhasil dihapus.");
     }
 }

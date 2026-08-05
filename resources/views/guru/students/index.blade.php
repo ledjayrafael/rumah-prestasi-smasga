@@ -10,7 +10,7 @@
                 @if ($homeroomClasses->isEmpty())
                     Belum ada kelas binaan
                 @else
-                    {{ $students->total() }} akun · {{ $homeroomClasses->count() }} kelas binaan ({{ $homeroomClasses->join(', ') }})
+                    {{ $students->count() }} akun · {{ $homeroomClasses->count() }} kelas binaan ({{ $homeroomClasses->join(', ') }})
                 @endif
             </p>
         </div>
@@ -49,23 +49,44 @@
                 </div>
             </div>
         @else
+            <form id="bulk-destroy-form" method="POST" action="{{ route('guru.students.bulk-destroy') }}">
+                @csrf
+            </form>
+
+            <div id="bulk-bar" class="hidden mb-4 bg-navy-800 text-white rounded-2xl px-5 py-3.5 flex items-center gap-4 flex-wrap">
+                <div class="text-sm font-bold">
+                    <span id="bulk-count">0</span> siswa dipilih
+                </div>
+                <div class="flex-1"></div>
+                <button type="button" id="bulk-destroy-btn" class="bg-red-500 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-red-400 transition-colors">
+                    Hapus Terpilih
+                </button>
+            </div>
+
             <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 <div class="overflow-x-auto">
-                    <div class="min-w-[640px]">
-                        <div class="grid grid-cols-[1.6fr_1fr_0.8fr_1fr] gap-3.5 px-6 py-3 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wide">
-                            <div>Siswa</div><div>NIS</div><div>Status</div><div class="text-right">Aksi</div>
-                        </div>
-
+                    <div class="min-w-[680px]">
                         @php $lastClassId = null; @endphp
                         @foreach ($students as $student)
                             @php $classId = optional($student->studentProfile)->school_class_id; @endphp
                             @if ($classId !== $lastClassId)
-                                <div class="px-6 py-2 bg-navy-100/50 border-t border-slate-100 text-[11px] font-extrabold text-navy-800 uppercase tracking-wide">
+                                <div class="px-6 py-2 {{ $lastClassId === null ? '' : 'border-t border-slate-100' }} bg-navy-100/50 text-[11px] font-extrabold text-navy-800 uppercase tracking-wide">
                                     {{ optional($student->studentProfile->schoolClass)->name ?? 'Tanpa kelas' }}
                                 </div>
+                                @if ($lastClassId === null)
+                                    <div class="grid grid-cols-[0.3fr_1.6fr_1fr_0.8fr_1fr] gap-3.5 px-6 py-3 bg-slate-50 border-t border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wide items-center">
+                                        <div>
+                                            <input type="checkbox" id="select-all" class="w-4 h-4 rounded border-slate-300 text-navy-800 focus:ring-navy-700">
+                                        </div>
+                                        <div>Siswa</div><div>NIS</div><div>Status</div><div class="text-right">Aksi</div>
+                                    </div>
+                                @endif
                                 @php $lastClassId = $classId; @endphp
                             @endif
-                            <div class="grid grid-cols-[1.6fr_1fr_0.8fr_1fr] gap-3.5 px-6 py-3.5 items-center border-t border-slate-100 hover:bg-slate-50/60 transition-colors">
+                            <div class="grid grid-cols-[0.3fr_1.6fr_1fr_0.8fr_1fr] gap-3.5 px-6 py-3.5 items-center border-t border-slate-100 hover:bg-slate-50/60 transition-colors">
+                                <div>
+                                    <input type="checkbox" value="{{ $student->id }}" class="student-checkbox w-4 h-4 rounded border-slate-300 text-navy-800 focus:ring-navy-700">
+                                </div>
                                 <div class="flex items-center gap-2.5 min-w-0">
                                     <div class="w-9 h-9 rounded-lg bg-navy-100 text-navy-800 flex items-center justify-center text-xs font-extrabold shrink-0">
                                         {{ Str::of($student->name)->explode(' ')->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->join('') }}
@@ -93,8 +114,80 @@
                     </div>
                 </div>
             </div>
-
-            <div class="mt-4">{{ $students->links() }}</div>
         @endif
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const MAX_SELECTED = 50;
+            const checkboxes = Array.from(document.querySelectorAll('.student-checkbox'));
+            const selectAll = document.getElementById('select-all');
+            const bulkBar = document.getElementById('bulk-bar');
+            const bulkCount = document.getElementById('bulk-count');
+            const bulkDestroyBtn = document.getElementById('bulk-destroy-btn');
+            const bulkForm = document.getElementById('bulk-destroy-form');
+
+            if (!bulkForm || checkboxes.length === 0) {
+                return;
+            }
+
+            function selectedCheckboxes() {
+                return checkboxes.filter((checkbox) => checkbox.checked);
+            }
+
+            function refreshUi() {
+                const count = selectedCheckboxes().length;
+
+                bulkCount.textContent = count;
+                bulkBar.classList.toggle('hidden', count === 0);
+
+                selectAll.checked = count > 0 && count === checkboxes.length;
+                selectAll.indeterminate = count > 0 && count < checkboxes.length;
+            }
+
+            checkboxes.forEach((checkbox) => checkbox.addEventListener('change', refreshUi));
+
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = selectAll.checked;
+                });
+
+                refreshUi();
+            });
+
+            bulkDestroyBtn.addEventListener('click', function () {
+                const selected = selectedCheckboxes();
+
+                if (selected.length === 0) {
+                    return;
+                }
+
+                if (selected.length > MAX_SELECTED) {
+                    alert(`Maksimal ${MAX_SELECTED} siswa dapat dihapus sekaligus.`);
+
+                    return;
+                }
+
+                if (!confirm(`Hapus ${selected.length} akun siswa terpilih? Tindakan ini tidak dapat dibatalkan.`)) {
+                    return;
+                }
+
+                bulkForm.querySelectorAll('input[name="student_ids[]"]').forEach((input) => input.remove());
+
+                selected.forEach((checkbox) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'student_ids[]';
+                    input.value = checkbox.value;
+                    bulkForm.appendChild(input);
+                });
+
+                bulkForm.submit();
+            });
+
+            refreshUi();
+        });
+    </script>
+@endpush

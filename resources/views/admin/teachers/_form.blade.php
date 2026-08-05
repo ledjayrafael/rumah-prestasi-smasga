@@ -40,7 +40,7 @@
 </div>
 
 <div class="mt-4">
-    <label class="block text-xs font-bold text-slate-600 mb-1.5">Kelas Binaan</label>
+    <label class="block text-xs font-bold text-slate-600 mb-1.5">Kelas yang Diajar (untuk verifikasi prestasi)</label>
     <div class="flex flex-wrap gap-2">
         @php $selectedClasses = old('class_ids', isset($teacher) ? $teacher->taughtClasses->pluck('id')->all() : []); @endphp
         @foreach ($classes as $class)
@@ -50,6 +50,7 @@
             </label>
         @endforeach
     </div>
+    <p class="mt-1.5 text-xs text-slate-400">Penetapan wali kelas (kelas binaan) dilakukan di menu <span class="font-semibold text-slate-500">Kelola Kelas</span>, bukan di sini.</p>
 </div>
 
 @if(isset($teacher))
