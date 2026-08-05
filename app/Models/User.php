@@ -3,7 +3,6 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Enums\TeacherPosition;
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -116,7 +115,7 @@ class User extends Authenticatable
             return false;
         }
 
-        return $this->teacherProfile?->position === TeacherPosition::WaliKelas;
+        return $this->homeroomClasses()->exists();
     }
 
     /** @return Collection<int, int> */

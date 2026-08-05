@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\TeacherPosition;
 use App\Enums\UserRole;
 use App\Models\Competition;
 use App\Models\SchoolClass;
@@ -64,7 +63,6 @@ class DeveloperAccessTest extends TestCase
             ->post(route('admin.teachers.store'), [
                 'name' => 'Guru Baru',
                 'email' => 'guru.baru@example.test',
-                'position' => TeacherPosition::GuruMapel->value,
             ])
             ->assertForbidden();
 

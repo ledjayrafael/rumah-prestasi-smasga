@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Enums\AchievementCategory;
 use App\Enums\AchievementLevel;
 use App\Enums\ParticipationType;
-use App\Enums\TeacherPosition;
 use App\Enums\UserRole;
 use App\Models\Competition;
 use App\Models\SchoolClass;
@@ -59,7 +58,6 @@ class DatabaseSeeder extends Seeder
 
         $guru->teacherProfile()->create([
             'subject' => 'Matematika',
-            'position' => TeacherPosition::WaliKelas,
         ]);
 
         $kelasXiMipa2->update(['homeroom_teacher_id' => $guru->id]);

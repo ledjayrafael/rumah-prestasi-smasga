@@ -81,7 +81,7 @@ class AdminDashboardStats
             [
                 'label' => 'Prestasi menunggu verifikasi >3 hari',
                 'count' => $pendingOlderThan3Days,
-                'hint' => 'Ingatkan guru mapel/wali kelas untuk segera memverifikasi.',
+                'hint' => 'Ingatkan guru untuk segera memverifikasi.',
             ],
             [
                 'label' => 'Kelas belum punya prestasi disetujui tahun ini',

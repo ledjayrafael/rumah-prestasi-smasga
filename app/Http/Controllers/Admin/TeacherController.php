@@ -19,7 +19,7 @@ class TeacherController extends Controller
     {
         $teachers = User::query()
             ->where('role', UserRole::Guru)
-            ->with(['teacherProfile', 'taughtClasses'])
+            ->with(['teacherProfile', 'taughtClasses', 'homeroomClasses'])
             ->orderBy('name')
             ->get();
 
@@ -51,7 +51,6 @@ class TeacherController extends Controller
 
             $teacher->teacherProfile()->create([
                 'subject' => $validated['subject'] ?? null,
-                'position' => $validated['position'],
             ]);
 
             $teacher->taughtClasses()->sync($validated['class_ids'] ?? []);
@@ -111,7 +110,6 @@ class TeacherController extends Controller
 
             $teacher->teacherProfile()->update([
                 'subject' => $validated['subject'] ?? null,
-                'position' => $validated['position'],
             ]);
 
             $teacher->taughtClasses()->sync($validated['class_ids'] ?? []);

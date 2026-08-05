@@ -43,7 +43,7 @@
                     <div class="text-sm font-bold truncate">{{ auth()->user()->name }}</div>
                     <div class="text-[11px] text-white/60 truncate">
                         @if (auth()->user()->isGuru())
-                            {{ optional(auth()->user()->teacherProfile)->position?->label() }}
+                            {{ auth()->user()->isWaliKelas() ? 'Wali Kelas' : 'Guru' }}
                         @elseif (auth()->user()->isDeveloper())
                             Developer
                         @else

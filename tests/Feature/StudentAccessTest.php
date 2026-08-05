@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\TeacherPosition;
 use App\Enums\UserRole;
 use App\Models\SchoolClass;
 use App\Models\User;
@@ -29,23 +28,22 @@ class StudentAccessTest extends TestCase
             ->assertOk();
     }
 
-    public function test_guru_mapel_cannot_access_student_routes(): void
+    public function test_guru_without_homeroom_class_cannot_access_student_routes(): void
     {
-        $guruMapel = User::factory()->create([
-            'name' => 'Guru Mapel',
-            'username' => 'mapel@test.sch.id',
-            'email' => 'mapel@test.sch.id',
+        $guruTanpaKelasBinaan = User::factory()->create([
+            'name' => 'Guru Tanpa Kelas Binaan',
+            'username' => 'tanpa-kelas@test.sch.id',
+            'email' => 'tanpa-kelas@test.sch.id',
             'role' => UserRole::Guru,
             'password' => 'password',
             'must_change_password' => false,
         ]);
 
-        $guruMapel->teacherProfile()->create([
+        $guruTanpaKelasBinaan->teacherProfile()->create([
             'subject' => 'Fisika',
-            'position' => TeacherPosition::GuruMapel,
         ]);
 
-        $this->actingAs($guruMapel)
+        $this->actingAs($guruTanpaKelasBinaan)
             ->get(route('guru.students.index'))
             ->assertForbidden();
     }

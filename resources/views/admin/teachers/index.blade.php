@@ -19,7 +19,7 @@
                     <div class="grid grid-cols-[1.3fr_1.3fr_0.8fr_1.2fr_0.7fr_1.9fr] gap-3.5 px-6 py-3 bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wide">
                         <button type="button" data-sort-col="0" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Guru <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
                         <button type="button" data-sort-col="1" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Email <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
-                        <button type="button" data-sort-col="2" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Peran <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
+                        <button type="button" data-sort-col="2" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Wali Kelas <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
                         <button type="button" data-sort-col="3" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Kelas Binaan <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
                         <button type="button" data-sort-col="4" class="flex items-center gap-1 text-left uppercase tracking-wide hover:text-slate-600">Status <span data-sort-icon class="opacity-0 text-[9px]">▲</span></button>
                         <div class="text-right">{{ auth()->user()->isAdmin() ? 'Aksi' : '' }}</div>
@@ -29,7 +29,7 @@
                         <div class="grid grid-cols-[1.3fr_1.3fr_0.8fr_1.2fr_0.7fr_1.9fr] gap-3.5 px-6 py-3.5 items-center border-t border-slate-100" data-table-row>
                             <div class="text-sm font-bold text-navy-900 truncate min-w-0" title="{{ $teacher->name }}">{{ $teacher->name }}</div>
                             <div class="text-sm text-slate-600 truncate min-w-0" title="{{ $teacher->email }}">{{ $teacher->email }}</div>
-                            <div class="text-sm font-semibold text-slate-600 truncate min-w-0">{{ optional($teacher->teacherProfile)->position?->label() }}</div>
+                            <div class="text-sm font-semibold text-slate-600 truncate min-w-0">{{ $teacher->homeroomClasses->isNotEmpty() ? 'Wali Kelas' : '—' }}</div>
                             <div class="text-sm text-slate-600 truncate min-w-0" title="{{ $teacher->taughtClasses->pluck('name')->join(', ') ?: '—' }}">{{ $teacher->taughtClasses->pluck('name')->join(', ') ?: '—' }}</div>
                             <div>
                                 <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $teacher->is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500' }}">

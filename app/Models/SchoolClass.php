@@ -26,7 +26,7 @@ class SchoolClass extends Model
         return $this->hasMany(StudentProfile::class);
     }
 
-    /** Guru yang membina kelas ini (wali kelas / guru mapel). */
+    /** Guru yang mengajar kelas ini (many-to-many, terpisah dari wali kelas). */
     public function teachers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'class_teacher');

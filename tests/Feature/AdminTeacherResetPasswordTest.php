@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\TeacherPosition;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,7 +26,7 @@ class AdminTeacherResetPasswordTest extends TestCase
             'password' => 'old-password-123',
             'must_change_password' => false,
         ]);
-        $teacher->teacherProfile()->create(['position' => TeacherPosition::GuruMapel]);
+        $teacher->teacherProfile()->create([]);
 
         return $teacher;
     }

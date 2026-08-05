@@ -6,7 +6,6 @@ use App\Enums\AchievementCategory;
 use App\Enums\AchievementLevel;
 use App\Enums\AchievementStatus;
 use App\Enums\ParticipationType;
-use App\Enums\TeacherPosition;
 use App\Enums\UserRole;
 use App\Models\SchoolClass;
 use App\Models\User;
@@ -32,7 +31,6 @@ class GuruDashboardStatsTest extends TestCase
         ]);
         $wali->teacherProfile()->create([
             'subject' => 'Matematika',
-            'position' => TeacherPosition::WaliKelas,
         ]);
         $wali->taughtClasses()->attach($class->id);
 
