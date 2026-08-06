@@ -16,10 +16,7 @@ class StoreTeacherRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'subject' => ['nullable', 'string', 'max:100'],
-            'class_ids' => ['nullable', 'array'],
-            'class_ids.*' => ['exists:school_classes,id'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
         ];
     }
 }

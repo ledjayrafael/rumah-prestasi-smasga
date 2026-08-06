@@ -6,7 +6,6 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreTeacherRequest;
 use App\Http\Requests\Admin\UpdateTeacherRequest;
-use App\Models\SchoolClass;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +18,7 @@ class TeacherController extends Controller
     {
         $teachers = User::query()
             ->where('role', UserRole::Guru)
-            ->with(['teacherProfile', 'taughtClasses', 'homeroomClasses'])
+            ->with('homeroomClasses')
             ->orderBy('name')
             ->get();
 
@@ -28,9 +27,7 @@ class TeacherController extends Controller
 
     public function create(): View
     {
-        $classes = SchoolClass::orderBy('grade_level')->orderBy('name')->get();
-
-        return view('admin.teachers.create', compact('classes'));
+        return view('admin.teachers.create');
     }
 
     public function store(StoreTeacherRequest $request): RedirectResponse
@@ -49,11 +46,7 @@ class TeacherController extends Controller
                 'must_change_password' => true,
             ]);
 
-            $teacher->teacherProfile()->create([
-                'subject' => $validated['subject'] ?? null,
-            ]);
-
-            $teacher->taughtClasses()->sync($validated['class_ids'] ?? []);
+            $teacher->teacherProfile()->create();
 
             return $teacher;
         });
@@ -87,10 +80,7 @@ class TeacherController extends Controller
     {
         abort_unless($teacher->role === UserRole::Guru, 404);
 
-        $teacher->load(['teacherProfile', 'taughtClasses']);
-        $classes = SchoolClass::orderBy('grade_level')->orderBy('name')->get();
-
-        return view('admin.teachers.edit', compact('teacher', 'classes'));
+        return view('admin.teachers.edit', compact('teacher'));
     }
 
     public function update(UpdateTeacherRequest $request, User $teacher): RedirectResponse
@@ -107,12 +97,6 @@ class TeacherController extends Controller
                 'phone' => $validated['phone'] ?? null,
                 'is_active' => $validated['is_active'] ?? true,
             ]);
-
-            $teacher->teacherProfile()->update([
-                'subject' => $validated['subject'] ?? null,
-            ]);
-
-            $teacher->taughtClasses()->sync($validated['class_ids'] ?? []);
         });
 
         return redirect()->route('admin.teachers.index')->with('status', 'Akun guru berhasil diperbarui.');

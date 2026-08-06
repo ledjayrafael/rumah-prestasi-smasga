@@ -30,7 +30,7 @@
                             <div class="text-sm font-bold text-navy-900 truncate min-w-0" title="{{ $teacher->name }}">{{ $teacher->name }}</div>
                             <div class="text-sm text-slate-600 truncate min-w-0" title="{{ $teacher->email }}">{{ $teacher->email }}</div>
                             <div class="text-sm font-semibold text-slate-600 truncate min-w-0">{{ $teacher->homeroomClasses->isNotEmpty() ? 'Wali Kelas' : '—' }}</div>
-                            <div class="text-sm text-slate-600 truncate min-w-0" title="{{ $teacher->taughtClasses->pluck('name')->join(', ') ?: '—' }}">{{ $teacher->taughtClasses->pluck('name')->join(', ') ?: '—' }}</div>
+                            <div class="text-sm text-slate-600 truncate min-w-0" title="{{ $teacher->homeroomClasses->pluck('name')->join(', ') ?: '—' }}">{{ $teacher->homeroomClasses->pluck('name')->join(', ') ?: '—' }}</div>
                             <div>
                                 <span class="text-[11px] font-bold px-2.5 py-1 rounded-full {{ $teacher->is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500' }}">
                                     {{ $teacher->is_active ? 'Aktif' : 'Nonaktif' }}
