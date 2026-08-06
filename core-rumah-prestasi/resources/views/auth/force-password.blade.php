@@ -31,9 +31,11 @@
             </button>
         </form>
 
-        <form method="POST" action="{{ route('logout') }}" class="mt-3">
+        <form method="POST" action="{{ route('logout') }}" class="mt-3" data-confirm-logout>
             @csrf
             <button type="submit" class="w-full text-center text-xs font-semibold text-slate-400 hover:text-red-600">Keluar</button>
         </form>
     </div>
+
+    <x-logout-confirm-modal />
 @endsection

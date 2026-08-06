@@ -191,7 +191,7 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ route('logout') }}" class="px-4 mt-5">
+    <form method="POST" action="{{ route('logout') }}" class="px-4 mt-5" data-confirm-logout>
         @csrf
         <button type="submit" class="w-full flex items-center justify-center gap-2 bg-white border border-red-200 text-red-600 text-sm font-bold rounded-2xl py-3 transition-colors hover:bg-red-50 active:scale-[0.98]">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
@@ -206,6 +206,8 @@
         Copyright &copy; {{ date('Y') }}
         <a href="https://cvsatriateknologi.com/" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-navy-700 underline">CV SATRIA TEKNOLOGI</a>
     </div>
+
+    <x-logout-confirm-modal />
 
     <style>
         @keyframes id-card-in {
