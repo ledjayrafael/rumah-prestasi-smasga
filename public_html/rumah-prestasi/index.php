@@ -5,7 +5,8 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-$core = __DIR__.'/../core-rumah-prestasi';
+// From public_html/rumah-prestasi → repo root → core-rumah-prestasi
+$core = __DIR__.'/../../core-rumah-prestasi';
 
 // Determine if the application is in maintenance mode...
 if (file_exists($maintenance = $core.'/storage/framework/maintenance.php')) {

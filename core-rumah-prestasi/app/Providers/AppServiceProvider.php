@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Enums\AchievementStatus;
 use App\Enums\UserRole;
 use App\Models\Achievement;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $sharedPublic = dirname(base_path()).'/public_html';
+        $sharedPublic = dirname(base_path()).'/public_html/rumah-prestasi';
 
         if (is_dir($sharedPublic)) {
             $this->app->usePublicPath($sharedPublic);
@@ -27,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($root = config('app.url')) {
+            URL::forceRootUrl($root);
+        }
+
         View::composer('layouts.desktop', function ($view) {
             $user = auth()->user();
 

@@ -74,7 +74,7 @@ return [
     */
 
     'links' => [
-        dirname(base_path()).DIRECTORY_SEPARATOR.'public_html'.DIRECTORY_SEPARATOR.'storage' => storage_path('app/public'),
+        dirname(base_path()).DIRECTORY_SEPARATOR.'public_html'.DIRECTORY_SEPARATOR.'rumah-prestasi'.DIRECTORY_SEPARATOR.'storage' => storage_path('app/public'),
     ],
 
 ];

@@ -12,14 +12,14 @@ export default defineConfig({
                 'resources/js/admin-dashboard-charts.js',
                 'resources/js/admin-teachers-table.js',
             ],
-            publicDirectory: '../public_html',
+            publicDirectory: '../public_html/rumah-prestasi',
             buildDirectory: 'build',
             refresh: true,
         }),
         tailwindcss(),
     ],
     build: {
-        outDir: '../public_html/build',
+        outDir: '../public_html/rumah-prestasi/build',
         emptyOutDir: true,
     },
     server: {

@@ -16,8 +16,8 @@ node_modules/
 core-rumah-prestasi/public/build
 core-rumah-prestasi/public/hot
 core-rumah-prestasi/public/storage
-public_html/hot
-public_html/storage
+public_html/rumah-prestasi/hot
+public_html/rumah-prestasi/storage
 **/storage/*.key
 **/storage/pail
 vendor/
