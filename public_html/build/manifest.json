@@ -1,0 +1,45 @@
+{
+  "_chart-Ckv-JwP6.js": {
+    "file": "assets/chart-Ckv-JwP6.js",
+    "name": "chart"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-BAzmcgJf.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/admin-dashboard-charts.js": {
+    "file": "assets/admin-dashboard-charts-rZC8tCqd.js",
+    "name": "admin-dashboard-charts",
+    "src": "resources/js/admin-dashboard-charts.js",
+    "isEntry": true,
+    "imports": [
+      "_chart-Ckv-JwP6.js"
+    ]
+  },
+  "resources/js/admin-teachers-table.js": {
+    "file": "assets/admin-teachers-table-mGU5ChH6.js",
+    "name": "admin-teachers-table",
+    "src": "resources/js/admin-teachers-table.js",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-CIomGrQN.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/guru-dashboard-charts.js": {
+    "file": "assets/guru-dashboard-charts-rbPgRUWP.js",
+    "name": "guru-dashboard-charts",
+    "src": "resources/js/guru-dashboard-charts.js",
+    "isEntry": true,
+    "imports": [
+      "_chart-Ckv-JwP6.js"
+    ]
+  }
+}

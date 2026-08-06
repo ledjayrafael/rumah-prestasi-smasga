@@ -12,10 +12,16 @@ export default defineConfig({
                 'resources/js/admin-dashboard-charts.js',
                 'resources/js/admin-teachers-table.js',
             ],
+            publicDirectory: '../public_html',
+            buildDirectory: 'build',
             refresh: true,
         }),
         tailwindcss(),
     ],
+    build: {
+        outDir: '../public_html/build',
+        emptyOutDir: true,
+    },
     server: {
         watch: {
             ignored: ['**/storage/framework/views/**'],

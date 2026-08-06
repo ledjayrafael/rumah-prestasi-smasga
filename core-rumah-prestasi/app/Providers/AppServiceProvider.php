@@ -15,7 +15,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $sharedPublic = dirname(base_path()).'/public_html';
+
+        if (is_dir($sharedPublic)) {
+            $this->app->usePublicPath($sharedPublic);
+        }
     }
 
     /**

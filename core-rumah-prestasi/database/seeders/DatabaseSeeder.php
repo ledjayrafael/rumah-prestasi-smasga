@@ -13,10 +13,16 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Password sementara untuk seluruh akun hasil seeding. Setiap akun dipaksa
-     * ganti password saat login pertama (must_change_password = true).
+     * Password sementara untuk seluruh akun hasil seeding. Di local, setiap akun
+     * dipaksa ganti password saat login pertama. Di testing dibiarkan false agar
+     * feature test bisa mengakses route tanpa redirect force-password.
      */
     private const TEMP_PASSWORD = 'smasga2026';
+
+    private function mustChangePassword(): bool
+    {
+        return ! app()->environment('testing');
+    }
 
     /**
      * Seed data akun nyata sekolah (admin, developer, wali kelas per rombel, dan
@@ -34,7 +40,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@smasga.sch.id',
             'role' => UserRole::Admin,
             'password' => self::TEMP_PASSWORD,
-            'must_change_password' => true,
+            'must_change_password' => $this->mustChangePassword(),
         ]);
 
         User::create([
@@ -43,7 +49,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'developer@smasga.sch.id',
             'role' => UserRole::Developer,
             'password' => self::TEMP_PASSWORD,
-            'must_change_password' => true,
+            'must_change_password' => $this->mustChangePassword(),
         ]);
 
         // name => [grade_level, homeroom teacher name, teacher email local-part]
@@ -88,7 +94,7 @@ class DatabaseSeeder extends Seeder
                 'email' => $email,
                 'role' => UserRole::Guru,
                 'password' => self::TEMP_PASSWORD,
-                'must_change_password' => true,
+                'must_change_password' => $this->mustChangePassword(),
             ]);
 
             $guru->teacherProfile()->create();
@@ -152,7 +158,7 @@ class DatabaseSeeder extends Seeder
                 'username' => $nis,
                 'role' => UserRole::Siswa,
                 'password' => self::TEMP_PASSWORD,
-                'must_change_password' => true,
+                'must_change_password' => $this->mustChangePassword(),
             ]);
 
             $siswa->studentProfile()->create([
