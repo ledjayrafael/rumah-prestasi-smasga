@@ -26,11 +26,13 @@ class DatabaseSeeder extends Seeder
 
     /**
      * Seed data akun nyata sekolah (admin, developer, wali kelas per rombel, dan
-     * siswa kelas X A) agar bisa dipakai untuk setup ulang environment lokal/testing.
+     * siswa kelas X A) agar bisa dipakai untuk setup ulang environment
+     * local/testing/development. Diblokir di production.
      */
     public function run(): void
     {
-        if (! app()->environment('local', 'testing')) {
+        // Local/testing/development only — never auto-seed production.
+        if (! app()->environment('local', 'testing', 'development')) {
             return;
         }
 

@@ -4,7 +4,10 @@
     </IfModule>
 
     RewriteEngine On
-    RewriteBase /rumah-prestasi/
+
+    # Subdomain docroot = public_html/rumah-prestasi → use /
+    # If hosted as cafevisual.com/rumah-prestasi/ subdirectory, use /rumah-prestasi/ instead
+    RewriteBase /
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
