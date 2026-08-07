@@ -118,14 +118,14 @@
                     img.alt = filename;
                     img.classList.remove('hidden');
                     frame.classList.add('hidden');
-                    frame.src = '';
+                    frame.src = 'about:blank';
                 } else {
                     panel.classList.remove('max-w-sm');
                     panel.classList.add('max-w-2xl');
                     frame.src = src;
                     frame.classList.remove('hidden');
                     img.classList.add('hidden');
-                    img.src = '';
+                    img.removeAttribute('src');
                 }
 
                 modal.classList.remove('hidden');
@@ -135,8 +135,8 @@
             function closeModal() {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
-                img.src = '';
-                frame.src = '';
+                img.removeAttribute('src');
+                frame.src = 'about:blank';
             }
 
             document.querySelectorAll('.file-preview-trigger').forEach(function (btn) {
