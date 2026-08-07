@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="h-[74px] bg-white border-b border-slate-200 flex items-center gap-3.5 px-8 shrink-0">
-        <a href="{{ route('guru.verification.index') }}" class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center">
+        <a href="{{ route('guru.verification.index') }}" class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center cursor-pointer transition-colors duration-150 hover:bg-slate-100 active:bg-slate-200">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4B4A66" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         </a>
         <div>
@@ -38,8 +38,12 @@
 
         <div class="flex flex-col gap-4">
             <div class="bg-white border border-slate-200 rounded-2xl p-4.5 flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-navy-100 text-navy-800 flex items-center justify-center text-sm font-extrabold shrink-0">
-                    {{ Str::of($achievement->student->name)->explode(' ')->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->join('') }}
+                <div class="w-11 h-11 rounded-xl bg-navy-100 text-navy-800 flex items-center justify-center text-sm font-extrabold shrink-0 overflow-hidden">
+                    @if ($achievement->student->avatarUrl())
+                        <img src="{{ $achievement->student->avatarUrl() }}" alt="Foto profil {{ $achievement->student->name }}" class="w-full h-full object-cover">
+                    @else
+                        {{ Str::of($achievement->student->name)->explode(' ')->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->join('') }}
+                    @endif
                 </div>
                 <div>
                     <div class="text-sm font-extrabold text-navy-900">{{ $achievement->student->name }}</div>
@@ -77,12 +81,12 @@
 
                 <div class="flex gap-3">
                     <button type="submit" form="revision-form"
-                            class="flex-1 h-12.5 rounded-2xl bg-white border-[1.5px] border-red-200 text-red-600 text-sm font-bold flex items-center justify-center gap-2">
+                            class="flex-1 h-12.5 rounded-2xl bg-white border-[1.5px] border-red-200 text-red-600 text-sm font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors duration-150 hover:bg-red-50 active:bg-red-100">
                         Minta Revisi
                     </button>
                     <form method="POST" action="{{ route('guru.verification.approve', $achievement) }}" class="flex-[1.4]">
                         @csrf
-                        <button type="submit" class="w-full h-12.5 rounded-2xl bg-green-600 text-white text-sm font-bold shadow-lg shadow-green-600/30">
+                        <button type="submit" class="w-full h-12.5 rounded-2xl bg-green-600 text-white text-sm font-bold shadow-lg shadow-green-600/30 cursor-pointer transition-colors duration-150 hover:bg-green-700 active:bg-green-800">
                             Setujui Prestasi
                         </button>
                     </form>
