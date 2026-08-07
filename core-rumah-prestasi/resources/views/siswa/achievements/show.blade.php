@@ -73,22 +73,22 @@
         </div>
     </div>
 
-    <div id="image-preview-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-navy-950/80 backdrop-blur-sm px-4" role="dialog" aria-modal="true" aria-labelledby="image-preview-name">
-        <div id="image-preview-panel" class="w-full max-w-sm">
+    <div id="image-preview-modal" class="fixed inset-0 z-[100] hidden items-end justify-center bg-navy-950/70 backdrop-blur-sm opacity-0 transition-opacity duration-200" role="dialog" aria-modal="true" aria-labelledby="image-preview-name">
+        <div id="image-preview-panel" class="w-full max-w-md mx-auto rounded-t-3xl bg-navy-950 p-4 translate-y-full transition-transform duration-[250ms] ease-out">
             <div class="flex items-center justify-between gap-2 mb-2">
                 <div id="image-preview-name" class="text-xs font-semibold text-white/80 truncate"></div>
                 <div class="flex items-center gap-2 shrink-0">
-                    <a id="image-preview-download" href="#" download class="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center active:scale-95 transition-transform">
+                    <a id="image-preview-download" href="#" download class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center active:scale-95 transition-transform">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
                     </a>
-                    <button type="button" id="image-preview-close" class="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center active:scale-95 transition-transform">
+                    <button type="button" id="image-preview-close" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center active:scale-95 transition-transform">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
                 </div>
             </div>
             <div class="rounded-2xl overflow-hidden bg-slate-900">
-                <img id="image-preview-img" src="" alt="" class="w-full max-h-[70vh] object-contain">
-                <iframe id="image-preview-frame" src="" class="w-full h-[75vh] hidden" title="Pratinjau berkas"></iframe>
+                <img id="image-preview-img" src="" alt="" class="w-full max-h-[75vh] object-contain">
+                <iframe id="image-preview-frame" src="about:blank" class="w-full h-[80vh] hidden" title="Pratinjau berkas"></iframe>
             </div>
         </div>
     </div>
@@ -105,23 +105,21 @@
             var name = document.getElementById('image-preview-name');
             var downloadBtn = document.getElementById('image-preview-download');
             var closeBtn = document.getElementById('image-preview-close');
+            var closeTimer = null;
 
             function openModal(type, src, filename) {
+                clearTimeout(closeTimer);
                 name.textContent = filename;
                 downloadBtn.href = src;
                 downloadBtn.setAttribute('download', filename);
 
                 if (type === 'image') {
-                    panel.classList.remove('max-w-2xl');
-                    panel.classList.add('max-w-sm');
                     img.src = src;
                     img.alt = filename;
                     img.classList.remove('hidden');
                     frame.classList.add('hidden');
                     frame.src = 'about:blank';
                 } else {
-                    panel.classList.remove('max-w-sm');
-                    panel.classList.add('max-w-2xl');
                     frame.src = src;
                     frame.classList.remove('hidden');
                     img.classList.add('hidden');
@@ -130,13 +128,29 @@
 
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
+
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        modal.classList.remove('opacity-0');
+                        modal.classList.add('opacity-100');
+                        panel.classList.remove('translate-y-full');
+                        panel.classList.add('translate-y-0');
+                    });
+                });
             }
 
             function closeModal() {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                img.removeAttribute('src');
-                frame.src = 'about:blank';
+                modal.classList.remove('opacity-100');
+                modal.classList.add('opacity-0');
+                panel.classList.remove('translate-y-0');
+                panel.classList.add('translate-y-full');
+
+                closeTimer = setTimeout(function () {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    img.removeAttribute('src');
+                    frame.src = 'about:blank';
+                }, 250);
             }
 
             document.querySelectorAll('.file-preview-trigger').forEach(function (btn) {
