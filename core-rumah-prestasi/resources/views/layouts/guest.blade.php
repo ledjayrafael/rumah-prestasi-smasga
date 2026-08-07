@@ -7,6 +7,8 @@
     @vite(['resources/css/app.css'])
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
+    @stack('preloader')
+
     <div class="w-full max-w-sm">
         <div class="flex flex-col items-center mb-8">
             <div class="w-16 h-16 rounded-2xl bg-white shadow-md flex items-center justify-center p-2">
