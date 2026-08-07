@@ -50,21 +50,23 @@
                 @foreach ($achievement->files as $file)
                     @if ($file->isImage())
                         <button type="button"
+                                data-preview-type="image" data-preview-src="{{ $file->url() }}" data-preview-name="{{ $file->original_name }}"
                                 class="file-preview-trigger bg-white border border-slate-200 rounded-xl p-3 flex items-center gap-3 text-left w-full">
                             <img src="{{ $file->url() }}" alt="{{ $file->original_name }}"
-                                 data-preview-src="{{ $file->url() }}" data-preview-name="{{ $file->original_name }}"
                                  class="w-11 h-11 rounded-lg object-cover shrink-0 bg-slate-100">
                             <div class="min-w-0 flex-1 text-sm font-semibold text-navy-900 truncate">{{ $file->original_name }}</div>
                             <div class="text-[11px] text-slate-400 shrink-0">{{ number_format($file->size / 1024, 0) }} KB</div>
                         </button>
                     @else
-                        <a href="{{ $file->url() }}" target="_blank" class="bg-white border border-slate-200 rounded-xl p-3 flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-lg bg-navy-100 flex items-center justify-center shrink-0">
+                        <button type="button"
+                                data-preview-type="file" data-preview-src="{{ $file->url() }}" data-preview-name="{{ $file->original_name }}"
+                                class="file-preview-trigger bg-white border border-slate-200 rounded-xl p-3 flex items-center gap-3 text-left w-full">
+                            <div class="w-11 h-11 rounded-lg bg-navy-100 flex items-center justify-center shrink-0">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#232168" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
                             </div>
                             <div class="min-w-0 flex-1 text-sm font-semibold text-navy-900 truncate">{{ $file->original_name }}</div>
                             <div class="text-[11px] text-slate-400 shrink-0">{{ number_format($file->size / 1024, 0) }} KB</div>
-                        </a>
+                        </button>
                     @endif
                 @endforeach
             </div>
@@ -72,7 +74,7 @@
     </div>
 
     <div id="image-preview-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-navy-950/80 backdrop-blur-sm px-4" role="dialog" aria-modal="true" aria-labelledby="image-preview-name">
-        <div class="w-full max-w-sm">
+        <div id="image-preview-panel" class="w-full max-w-sm">
             <div class="flex items-center justify-between gap-2 mb-2">
                 <div id="image-preview-name" class="text-xs font-semibold text-white/80 truncate"></div>
                 <div class="flex items-center gap-2 shrink-0">
@@ -86,6 +88,7 @@
             </div>
             <div class="rounded-2xl overflow-hidden bg-slate-900">
                 <img id="image-preview-img" src="" alt="" class="w-full max-h-[70vh] object-contain">
+                <iframe id="image-preview-frame" src="" class="w-full h-[75vh] hidden" title="Pratinjau berkas"></iframe>
             </div>
         </div>
     </div>
@@ -96,17 +99,35 @@
             if (!modal || modal.dataset.bound === '1') return;
             modal.dataset.bound = '1';
 
+            var panel = document.getElementById('image-preview-panel');
             var img = document.getElementById('image-preview-img');
+            var frame = document.getElementById('image-preview-frame');
             var name = document.getElementById('image-preview-name');
             var downloadBtn = document.getElementById('image-preview-download');
             var closeBtn = document.getElementById('image-preview-close');
 
-            function openModal(src, filename) {
-                img.src = src;
-                img.alt = filename;
+            function openModal(type, src, filename) {
                 name.textContent = filename;
                 downloadBtn.href = src;
                 downloadBtn.setAttribute('download', filename);
+
+                if (type === 'image') {
+                    panel.classList.remove('max-w-2xl');
+                    panel.classList.add('max-w-sm');
+                    img.src = src;
+                    img.alt = filename;
+                    img.classList.remove('hidden');
+                    frame.classList.add('hidden');
+                    frame.src = '';
+                } else {
+                    panel.classList.remove('max-w-sm');
+                    panel.classList.add('max-w-2xl');
+                    frame.src = src;
+                    frame.classList.remove('hidden');
+                    img.classList.add('hidden');
+                    img.src = '';
+                }
+
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
             }
@@ -115,12 +136,12 @@
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
                 img.src = '';
+                frame.src = '';
             }
 
             document.querySelectorAll('.file-preview-trigger').forEach(function (btn) {
                 btn.addEventListener('click', function () {
-                    var thumb = btn.querySelector('[data-preview-src]');
-                    openModal(thumb.dataset.previewSrc, thumb.dataset.previewName);
+                    openModal(btn.dataset.previewType, btn.dataset.previewSrc, btn.dataset.previewName);
                 });
             });
 

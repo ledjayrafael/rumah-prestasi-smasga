@@ -19,14 +19,12 @@ class AchievementFileController extends Controller
 
         abort_unless(Storage::disk('local')->exists($file->path), 404);
 
-        $disposition = $file->isImage() ? 'inline' : 'attachment';
-
         return Storage::disk('local')->response(
             $file->path,
             $file->original_name,
             [
                 'Content-Type' => $file->mime_type,
-                'Content-Disposition' => $disposition.'; filename="'.addslashes($file->original_name).'"',
+                'Content-Disposition' => 'inline; filename="'.addslashes($file->original_name).'"',
             ]
         );
     }
