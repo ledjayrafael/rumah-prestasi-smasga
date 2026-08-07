@@ -4,98 +4,58 @@
 
 @push('preloader')
     <style>
-        @keyframes preloader-shimmer-sweep {
-            0% { transform: translateX(-100%); opacity: 0; }
-            20% { opacity: 1; }
-            100% { transform: translateX(350%); opacity: 0; }
-        }
         @keyframes preloader-fill {
-            from { transform: scaleX(0); }
-            to { transform: scaleX(1); }
-        }
-        @keyframes preloader-fade-out {
-            to { opacity: 0; }
-        }
-        @keyframes preloader-fade-in {
-            to { opacity: 1; }
-        }
-
-        #preloader-shimmer {
-            animation: preloader-shimmer-sweep .4s cubic-bezier(.4, 0, .2, 1) forwards;
+            from { width: 0%; }
+            to { width: 100%; }
         }
         #preloader-bar {
-            transform: scaleX(0);
-            animation: preloader-fill 2.6s cubic-bezier(.34, 1.56, .64, 1) .4s forwards;
+            animation: preloader-fill 3s linear forwards;
+            box-shadow: 10px 0 14px -3px var(--color-gold-400);
         }
-        #preloader-pending {
-            animation: preloader-fade-out .3s ease forwards .4s;
-        }
-        #preloader-percent-label {
-            animation: preloader-fade-in .3s ease forwards .4s;
-        }
-
         @media (prefers-reduced-motion: reduce) {
-            #preloader-shimmer, #preloader-bar, #preloader-pending, #preloader-percent-label {
-                animation: none !important;
+            #preloader-bar {
+                animation-duration: .01s;
+                box-shadow: none;
             }
-            #preloader-bar { transform: scaleX(1) !important; }
-            #preloader-pending { opacity: 0 !important; }
-            #preloader-percent-label { opacity: 1 !important; }
         }
     </style>
 
-    <div id="preloader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white transition-opacity duration-500">
-        <img src="{{ asset('images/logo-sman1.png') }}" alt="Logo SMAN 1 Tenggarang" class="h-12 w-auto animate-pulse">
-
-        <div class="mt-6 w-56">
-            <div class="flex items-baseline justify-between gap-3">
-                <span id="preloader-label" class="truncate text-[13px] font-medium text-slate-700">Rumah Prestasi</span>
-
-                <span aria-hidden="true" class="grid shrink-0 justify-items-end text-slate-500">
-                    <span id="preloader-pending" class="col-start-1 row-start-1 whitespace-nowrap text-[12px] font-medium leading-5 opacity-100">Menyiapkan</span>
-                    <span id="preloader-percent-label" class="col-start-1 row-start-1 whitespace-nowrap font-mono text-[12px] font-medium leading-5 tabular-nums opacity-0">0%</span>
-                </span>
+    <div id="preloader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-navy-950 transition-opacity duration-500">
+        <div class="flex flex-col items-center">
+            <div class="flex items-center gap-3">
+                <img src="{{ asset('images/logo-sman1.png') }}" alt="Logo SMAN 1 Tenggarang" class="h-8 w-auto">
+                <span class="text-sm font-bold text-white/90 tracking-wide">Rumah Prestasi</span>
             </div>
-
-            <div id="preloader-track" role="progressbar" aria-labelledby="preloader-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
-                class="mt-2 rounded-[4px] bg-slate-200/70 p-[2px] shadow-[inset_0_1px_2px_rgba(51,65,85,0.15),inset_0_0_0_1px_rgba(51,65,85,0.08)]">
-                <div class="relative h-[8px] overflow-hidden rounded-[2px]">
-                    <span id="preloader-shimmer" class="absolute inset-y-0 left-0 block w-2/5 rounded-[2px] bg-navy-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(28,25,23,0.2)]"></span>
-                    <span id="preloader-bar" class="absolute inset-0 block origin-left rounded-[2px] bg-navy-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(28,25,23,0.2)]"></span>
-                </div>
-            </div>
+            <div class="mt-3 h-px w-16 bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
         </div>
 
-        <span id="preloader-status" aria-live="polite" class="sr-only"></span>
+        <div class="mt-8 w-64">
+            <div class="flex items-center justify-between">
+                <span class="text-base font-bold text-white">Memuat</span>
+                <span id="preloader-percent" class="font-mono text-base font-bold text-gold-400 tabular-nums">0%</span>
+            </div>
+
+            <div class="mt-3 h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+                <div id="preloader-bar" class="h-full w-0 rounded-full bg-gradient-to-r from-navy-600 to-gold-500"></div>
+            </div>
+        </div>
     </div>
 
     <script>
         (function () {
-            var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            var indeterminateMs = reducedMotion ? 0 : 400;
-            var fillMs = reducedMotion ? 200 : 2600;
-            var totalMs = indeterminateMs + fillMs;
-
-            var percentLabel = document.getElementById('preloader-percent-label');
-            var track = document.getElementById('preloader-track');
-            var status = document.getElementById('preloader-status');
+            var duration = 3000;
+            var percent = document.getElementById('preloader-percent');
             var overlay = document.getElementById('preloader');
             var start = Date.now();
 
             document.documentElement.style.overflow = 'hidden';
 
             var interval = setInterval(function () {
-                var elapsed = Date.now() - start;
-                var fillElapsed = Math.max(0, elapsed - indeterminateMs);
-                var progress = Math.min(1, fillElapsed / fillMs);
-                var value = Math.round(progress * 100);
+                var progress = Math.min((Date.now() - start) / duration, 1);
+                percent.textContent = Math.round(progress * 100) + '%';
 
-                percentLabel.textContent = value + '%';
-                track.setAttribute('aria-valuenow', value);
-
-                if (elapsed >= totalMs) {
+                if (progress >= 1) {
                     clearInterval(interval);
-                    status.textContent = 'Selesai';
                 }
             }, 30);
 
@@ -105,7 +65,7 @@
                 setTimeout(function () {
                     overlay.remove();
                 }, 500);
-            }, totalMs);
+            }, duration);
         })();
     </script>
 @endpush
