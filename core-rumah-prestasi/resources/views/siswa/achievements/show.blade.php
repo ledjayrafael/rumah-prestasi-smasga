@@ -145,6 +145,7 @@
                 panel.classList.remove('translate-y-0');
                 panel.classList.add('translate-y-full');
 
+                // 250ms must match panel's duration-[250ms] class (line 77) to ensure cleanup after transition completes
                 closeTimer = setTimeout(function () {
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
