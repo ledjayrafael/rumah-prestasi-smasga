@@ -74,7 +74,7 @@
     </div>
 
     <div id="image-preview-modal" class="fixed inset-0 z-[100] hidden items-end justify-center bg-navy-950/70 backdrop-blur-sm opacity-0 transition-opacity duration-200" role="dialog" aria-modal="true" aria-labelledby="image-preview-name">
-        <div id="image-preview-panel" class="w-full max-w-md mx-auto rounded-t-3xl bg-navy-950 p-4 translate-y-full transition-transform duration-[250ms] ease-out">
+        <div id="image-preview-panel" class="w-full max-w-md mx-auto rounded-t-3xl bg-navy-950 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] translate-y-full transition-transform duration-[250ms] ease-out">
             <div class="flex items-center justify-between gap-2 mb-2">
                 <div id="image-preview-name" class="text-xs font-semibold text-white/80 truncate"></div>
                 <div class="flex items-center gap-2 shrink-0">
