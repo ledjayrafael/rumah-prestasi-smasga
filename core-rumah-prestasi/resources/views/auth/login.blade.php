@@ -13,7 +13,7 @@
         }
         #preloader-wrap {
             width: min(14rem, 70vw);
-            margin-top: 2.5rem;
+            margin-top: 20px;
             text-align: center;
         }
         #preloader-track {
