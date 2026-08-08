@@ -8,35 +8,45 @@
             from { width: 0%; }
             to { width: 100%; }
         }
+        #preloader {
+            transition: opacity .5s;
+        }
+        #preloader-wrap {
+            width: min(14rem, 70vw);
+            margin-top: 2.5rem;
+            text-align: center;
+        }
+        #preloader-track {
+            height: 3px;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 9999px;
+            background: #e2e8f0;
+        }
         #preloader-bar {
+            height: 100%;
+            width: 0;
+            border-radius: 9999px;
+            background: #232168;
             animation: preloader-fill 3s linear forwards;
-            box-shadow: 10px 0 14px -3px var(--color-gold-400);
         }
         @media (prefers-reduced-motion: reduce) {
             #preloader-bar {
                 animation-duration: .01s;
-                box-shadow: none;
             }
         }
     </style>
 
-    <div id="preloader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-navy-950 transition-opacity duration-500">
-        <div class="flex flex-col items-center">
-            <div class="flex items-center gap-3">
-                <img src="{{ asset('images/logo-sman1.png') }}" alt="Logo SMAN 1 Tenggarang" class="h-8 w-auto">
-                <span class="text-sm font-bold text-white/90 tracking-wide">Rumah Prestasi</span>
-            </div>
-            <div class="mt-3 h-px w-16 bg-gradient-to-r from-transparent via-gold-400 to-transparent"></div>
-        </div>
+    <div id="preloader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white">
+        <img src="{{ asset('images/logo-sman1.png') }}" alt="Logo SMAN 1 Tenggarang" class="h-16 w-auto">
+        <p class="mt-4 text-sm font-semibold tracking-wide text-navy-800">Rumah Prestasi</p>
 
-        <div class="mt-8 w-64">
-            <div class="flex items-center justify-between">
-                <span class="text-base font-bold text-white">Memuat</span>
-                <span id="preloader-percent" class="font-mono text-base font-bold text-gold-400 tabular-nums">0%</span>
+        <div id="preloader-wrap">
+            <div class="mb-2">
+                <span id="preloader-percent" class="font-mono text-xs text-navy-700 tabular-nums">0%</span>
             </div>
-
-            <div class="mt-3 h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
-                <div id="preloader-bar" class="h-full w-0 rounded-full bg-gradient-to-r from-navy-600 to-gold-500"></div>
+            <div id="preloader-track">
+                <div id="preloader-bar"></div>
             </div>
         </div>
     </div>
